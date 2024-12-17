@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "grooveguide",
+    "slug": "dosido",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAEBD7"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zlaoch.dosido"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.zlaoch.dosido"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "625347ae-bdaf-4518-8637-408e676a7d0b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/625347ae-bdaf-4518-8637-408e676a7d0b"
+    },
+    "owner": "zlaoch"
+  }
+}
