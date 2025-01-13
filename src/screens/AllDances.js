@@ -5,87 +5,136 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sharing from 'expo-sharing';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../UserContext';
+import {RequestModal} from '../components/RequestModal'
+import { UsernameModal } from '../components/UsernameModal';
+import { CustomModal } from '../components/CustomModal';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const AllDances = () => {
   const [search, setSearch] = useState('');
   const [dances, setDances] = useState([]);
   const [savedDances, setSavedDances] = useState([]);
   const { username, setUsername } = useUser();
+  const [fullscreenModal, setModal] = useState(null)
+  const [playlists, setPlaylists] = useState({});
+  const [playlistName, setPlaylistName] = React.useState("")
 
+    // Use useFocusEffect to reload playlists when the screen is focused
+    useFocusEffect(
+      React.useCallback(() => {
+        loadPlaylists();
+      }, [])
+    );
 
-        // Function to send a request to your PHP API
-        const requestDance = async (dance) => {
-          if (!username) {
-            Alert.prompt(
-              'Enter Username',
-              'Please enter your username to continue.',
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'OK',
-                  onPress: (name) => {
-                    if (name) {
-                      setUsername(name);
-                      sendRequest(name, dance);
-                    }
-                  },
-                },
-              ],
-              'plain-text'
-            );
+  const loadPlaylists = async () => {
+    try {
+      const savedPlaylists = JSON.parse(await AsyncStorage.getItem('playlists')) || {};
+      setPlaylists(savedPlaylists);
+    } catch (error) {
+      console.error('Error loading playlists:', error);
+    }
+  };
+
+  const saveToPlaylist = async (dance) => {
+    setModal(
+      <CustomModal
+        title="Add to Playlist"
+        body="Select a playlist or create a new one"
+        options={[
+          ...Object.keys(playlists).map((name) => ({ label: name, value: name })),
+          { label: 'Create New Playlist', value: 'new' },
+        ]}
+        handleRequest={(value) => {
+          if (value === 'new') {
+            setModal(null)
+            promptForPlaylistName(dance);
           } else {
-            sendRequest(username, dance);
+            setModal(null)
+            addDanceToPlaylist(dance, value);
           }
-        };
-    
-        const sendRequest = async (user, dance) => {
-          try {
-            const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                command: 'AddRequest', // Ensure the command is specified
-                username: user,
-                name: dance.name,
-                link: dance.link,
-                song: dance.song,
-                authorDate: dance.authorDate,
-                count: dance.count,
-                difficulty: dance.difficulty,
-              }),
-            });
-            
-            // Parse and log the response JSON
-            const responseData = await response.json();
-            
-            if (response.ok) {
-              console.log('Request sent successfully:', responseData);
-              Alert.alert("Success", "Your request was submitted successfully!");
+        }}
+        onClose={() => setModal(null)}
+      />
+    );
+  };
 
-            } else {
-              console.error('Failed to send request:', responseData);
-            }
-          } catch (error) {
-            console.error('Error sending request:', error);
+  const promptForPlaylistName = (dance) => {
+    setModal(
+     <PlaylistModal onClose={(newName) => {
+      addDanceToPlaylist(dance, newName)
+      setModal(null)}
+    }></PlaylistModal>
+    );
+  };
+
+  const addDanceToPlaylist = async (dance, playlistName) => {
+    const updatedPlaylists = { ...playlists };
+    if (!updatedPlaylists[playlistName]) {
+      updatedPlaylists[playlistName] = [];
+    }
+    updatedPlaylists[playlistName].push(dance);
+
+    setPlaylists(updatedPlaylists);
+    await AsyncStorage.setItem('playlists', JSON.stringify(updatedPlaylists));
+    console.log(`Dance added to playlist "${playlistName}":`, dance);
+  };
+
+
+
+      // Function to send a request to your PHP API
+      const requestDance = async (dance) => {
+        setModal(<RequestModal songId={1} isVisible={true} onClose={() => {setModal(null)}} handleRequest={(type) => {
+          if (!username) {
+            setModal(<UsernameModal onClose={(username) => {
+              setUsername(username)
+              sendRequest(username, dance);
+              setModal(null)}}></UsernameModal>)
+          } else {
+            sendRequest(username, dance, type);
+            setModal(null)
           }
-        };
+        
+        
+        }}></RequestModal>)
+      }
+  
+      const sendRequest = async (user, dance, type) => {
+        try {
+          const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              command: 'AddRequest', // Ensure the command is specified
+              username: user,
+              name: dance.name,
+              link: dance.link,
+              song: dance.song,
+              authorDate: dance.authorDate,
+              count: dance.count,
+              difficulty: dance.difficulty,
+              requestType: type
+            }),
+          });
+          
+          // Parse and log the response JSON
+          const responseData = await response.json();
+          
+          if (response.ok) {
+            console.log('Request sent successfully:', responseData);
+          } else {
+            console.error('Failed to send request:', responseData);
+          }
+        } catch (error) {
+          console.error('Error sending request:', error);
+        }
+      };
 
+  
 
   useEffect(() => {
-    const loadSavedDances = async () => {
-      try {
-        const saved = JSON.parse(await AsyncStorage.getItem('savedDances')) || [];
-        setSavedDances(saved);
-      } catch (error) {
-        console.error('Error loading saved dances:', error);
-      }
-    };
-    loadSavedDances();
+    loadPlaylists()
   }, []);
 
   useEffect(() => {
@@ -159,20 +208,8 @@ const AllDances = () => {
   }, [search]);
 
   const toggleSaveDance = async (dance) => {
-    try {
-      let updatedDances;
-      if (savedDances.find(savedDance => savedDance.link === dance.link)) {
-        updatedDances = savedDances.filter(savedDance => savedDance.link !== dance.link);
-        console.log('Dance unsaved successfully:', dance);
-      } else {
-        updatedDances = [...savedDances, dance];
-        console.log('Dance saved successfully:', dance);
-      }
-      await AsyncStorage.setItem('savedDances', JSON.stringify(updatedDances));
-      setSavedDances(updatedDances);
-    } catch (error) {
-      console.error('Error saving/unsaving dance:', error);
-    }
+    saveToPlaylist(dance)
+
   };
 
   const shareDance = async (link) => {
@@ -198,6 +235,8 @@ const AllDances = () => {
           onChangeText={text => setSearch(text)}
         />
         <ScrollView contentContainerStyle={styles.danceList}>
+        {fullscreenModal}
+
           {dances.length > 0 ? (
             dances.map((dance, index) => (
               <TouchableOpacity key={index} onPress={() => openLink(dance.link)} style={styles.danceCard}>

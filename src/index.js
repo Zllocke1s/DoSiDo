@@ -3,12 +3,24 @@ import { createStackNavigator, TransitionPresets } from 'react-navigation-stack'
 
 import {
   HomeScreen,
+  PlaylistDetails
 } from './screens';
 
 const Router = createStackNavigator(
   {
     HomeScreen: {
       screen: HomeScreen,
+      navigationOptions: {
+        header: ({scene, previous, navigation}) => {
+          return(null)
+        },  
+        ...TransitionPresets.ModalTransition
+      }
+    }
+  },  
+  {
+    PlaylistDetails: {
+      screen: PlaylistDetails,
       navigationOptions: {
         header: ({scene, previous, navigation}) => {
           return(null)

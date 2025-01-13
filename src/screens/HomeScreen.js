@@ -11,12 +11,13 @@ import { useUser } from '../UserContext';
 
 const Tab = createBottomTabNavigator();
 
-export const MainScreen = () => {
+export const MainScreen = ({navigation}) => {
 
   const { username } = useUser();
 
   return (
     <Tab.Navigator
+    initialRouteName="MyDances"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
