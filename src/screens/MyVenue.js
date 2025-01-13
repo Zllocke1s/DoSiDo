@@ -293,7 +293,7 @@ const MyVenue = ({ navigation }) => {
                   <View style={styles.actionButtons}>
                     <TouchableOpacity onPress={() => toggleSaveDance(dance)}>
                       <MaterialIcons
-                        name={savedDances.find(savedDance => savedDance.link === dance.link) ? "bookmark" : "bookmark-border"}
+                        name={"bookmark-border"}
                         size={24}
                         color="#5a3e36"
                         style={styles.actionButtonIcon}
