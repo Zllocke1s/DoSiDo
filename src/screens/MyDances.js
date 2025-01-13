@@ -3,14 +3,17 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import * as Sharing from 'expo-sharing';
+import { RequestModal } from '../components/RequestModal';
+import { UsernameModal } from '../components/UsernameModal';
+import { useUser } from '../UserContext';
 
-const MyDances = () => {
+const MyDances = ({navigation}) => {
   const [playlists, setPlaylists] = useState({});
   const [currentPlaylist, setCurrentPlaylist] = useState(null); // Track the current playlist
+  const [fullscreenModal, setModal] = useState(null);
+  const { username, setUsername, deviceId } = useUser();
 
-  useEffect(() => {
-    loadPlaylists();
-  }, []);
 
   // Use useFocusEffect to reload playlists when the screen is focused
   useFocusEffect(
@@ -25,6 +28,91 @@ const MyDances = () => {
     } catch (error) {
       console.error('Error loading playlists:', error);
     }
+  };
+
+  
+
+        // Function to send a request to your PHP API
+        const requestDance = async (dance) => {
+          setModal(<RequestModal songId={1} isVisible={true} onClose={() => {setModal(null)}} handleRequest={(type) => {
+            if (!username) {
+              setModal(<UsernameModal onClose={(username) => {
+                setUsername(username)
+                sendRequest(username, dance);
+                setModal(null)}}></UsernameModal>)
+            } else {
+              sendRequest(username, dance, type);
+              setModal(null)
+            }
+          
+          
+          }}></RequestModal>)
+        }
+    
+        const sendRequest = async (user, dance, type) => {
+          console.log("deviceID: ", deviceId)
+          try {
+            const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                command: 'AddRequest', // Ensure the command is specified
+                username: user,
+                name: dance.name,
+                link: dance.link,
+                song: dance.song,
+                authorDate: dance.authorDate,
+                count: dance.count,
+                difficulty: dance.difficulty,
+                requestType: type,
+                id: deviceId
+              }),
+            });
+            
+            // Parse and log the response JSON
+            const responseData = await response.json();
+            
+            if (response.ok) {
+              console.log('Request sent successfully:', responseData);
+            } else {
+              console.error('Failed to send request:', responseData);
+            }
+          } catch (error) {
+            console.error('Error sending request:', error);
+          }
+        };
+
+  useEffect(() => {
+    const loadSavedDances = async () => {
+      try {
+        const savedDances = JSON.parse(await AsyncStorage.getItem('savedDances')) || [];
+        setDances(savedDances);
+        console.log('Loaded saved dances:', savedDances);
+      } catch (error) {
+        console.error('Error loading saved dances:', error);
+      }
+    };
+
+    const focusListener = navigation?.addListener('focus', loadSavedDances);
+
+    loadSavedDances();
+
+    return focusListener;
+  }, []);
+
+
+  const shareDance = async (link) => {
+    try {
+      await Sharing.shareAsync(link);
+    } catch (error) {
+      console.error('Error sharing dance link:', error);
+    }
+  };
+
+  const openLink = (link) => {
+    Linking.openURL(link);
   };
 
   const deletePlaylist = async (playlistName) => {
@@ -59,6 +147,7 @@ const MyDances = () => {
 
   return (
     <View style={styles.container}>
+                {fullscreenModal}
       {currentPlaylist ? (
         // Playlist View
         <>
@@ -68,17 +157,31 @@ const MyDances = () => {
           </TouchableOpacity>
           <ScrollView contentContainerStyle={styles.danceList}>
             {playlists[currentPlaylist].map((dance, index) => (
-              <View key={index} style={styles.danceCard}>
-                <Text style={styles.danceName}>{dance.name}</Text>
-                <Text style={styles.danceDetails}>{dance.authorDate}</Text>
-                <Text style={styles.danceDetails}>{dance.details}</Text>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeDanceFromPlaylist(dance.name)}
-                >
-                  <Text style={styles.removeButtonText}>Remove</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity key={index} onPress={() => openLink(dance.link)} style={styles.danceCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.danceName} numberOfLines={1}>{dance.name}</Text>
+                  <View style={styles.actionButtons}>
+                    <TouchableOpacity onPress={async () => {
+                      //Todo Add unsave
+                      removeDanceFromPlaylist(dance.name)
+                    }}>
+                      <MaterialIcons name="bookmark" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                    </TouchableOpacity>
+                  
+                    <TouchableOpacity onPress={() => shareDance(dance.link)}>
+                      <MaterialIcons name="share" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                    </TouchableOpacity>
+                    { true && 
+                    <TouchableOpacity onPress={() => requestDance(dance)}>
+                        <MaterialIcons name="send" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                      </TouchableOpacity>}
+                  </View>
+                </View>
+                <Text style={styles.danceDetails}>Author/Date: {dance.authorDate}</Text>
+                <Text style={styles.danceDetails}>Count: {dance.count}</Text>
+                <Text style={styles.danceDetails}>Difficulty: {dance.difficulty}</Text>
+                <Text style={styles.danceDetails}>Song: {dance.song}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </>
@@ -224,6 +327,16 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  actionButtonIcon: {
+    marginHorizontal: 5,
+  },  actionButtons: {
+    flexDirection: 'row',
   },
 });
 
