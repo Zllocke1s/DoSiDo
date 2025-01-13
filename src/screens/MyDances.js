@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
@@ -148,9 +148,16 @@ const MyDances = ({navigation}) => {
   return (
     <View style={styles.container}>
                 {fullscreenModal}
+                <TextInput
+          style={styles.usernameInput}
+          placeholder="Enter username"
+          value={username}
+          onChangeText={(text) => setUsername(text)}
+        />
       {currentPlaylist ? (
         // Playlist View
         <>
+        
           <Text style={styles.title}>{currentPlaylist}</Text>
           <TouchableOpacity style={styles.backButton} onPress={leavePlaylistView}>
             <Text style={styles.backButtonText}>Back to Playlists</Text>
@@ -188,7 +195,9 @@ const MyDances = ({navigation}) => {
       ) : (
         // Playlist Selection View
         <>
+        <TouchableOpacity onPress={() => {}}>
           <Text style={styles.title}>My Playlists</Text>
+          </TouchableOpacity>
           <ScrollView contentContainerStyle={styles.playlistList}>
             {Object.keys(playlists).length > 0 ? (
               Object.entries(playlists).map(([playlistName, dances]) => (
@@ -200,21 +209,7 @@ const MyDances = ({navigation}) => {
                     <Text style={styles.playlistName}>{playlistName}</Text>
                     <Text style={styles.playlistCount}>{dances.length} dances</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() =>
-                      Alert.alert(
-                        'Delete Playlist',
-                        `Are you sure you want to delete "${playlistName}"?`,
-                        [
-                          { text: 'Cancel', style: 'cancel' },
-                          { text: 'Delete', onPress: () => deletePlaylist(playlistName) },
-                        ]
-                      )
-                    }
-                  >
-                    <MaterialIcons name="delete" size={24} color="#FFF" />
-                  </TouchableOpacity>
+                  
                 </View>
               ))
             ) : (

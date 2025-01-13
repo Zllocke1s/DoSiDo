@@ -49,7 +49,7 @@ export const MainScreen = ({navigation}) => {
       <Tab.Screen name="My Venue" component={MyVenue} />
       <Tab.Screen name="My Dances" component={MyDances} />
       <Tab.Screen name="All Dances" component={AllDances} />
-      {username === 'Instructor' && (
+      {username.includes('Instructor') && (
 
       <Tab.Screen name="Requests" component={RequestList} />
       )}

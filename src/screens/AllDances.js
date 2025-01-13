@@ -14,7 +14,7 @@ const AllDances = () => {
   const [search, setSearch] = useState('');
   const [dances, setDances] = useState([]);
   const [savedDances, setSavedDances] = useState([]);
-  const { username, setUsername } = useUser();
+  const { username, setUsername, deviceId } = useUser();
   const [fullscreenModal, setModal] = useState(null)
   const [playlists, setPlaylists] = useState({});
   const [playlistName, setPlaylistName] = React.useState("")
@@ -81,55 +81,58 @@ const AllDances = () => {
 
 
 
-      // Function to send a request to your PHP API
-      const requestDance = async (dance) => {
-        setModal(<RequestModal songId={1} isVisible={true} onClose={() => {setModal(null)}} handleRequest={(type) => {
-          if (!username) {
-            setModal(<UsernameModal onClose={(username) => {
-              setUsername(username)
-              sendRequest(username, dance);
-              setModal(null)}}></UsernameModal>)
-          } else {
-            sendRequest(username, dance, type);
-            setModal(null)
-          }
-        
-        
-        }}></RequestModal>)
-      }
-  
-      const sendRequest = async (user, dance, type) => {
-        try {
-          const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              command: 'AddRequest', // Ensure the command is specified
-              username: user,
-              name: dance.name,
-              link: dance.link,
-              song: dance.song,
-              authorDate: dance.authorDate,
-              count: dance.count,
-              difficulty: dance.difficulty,
-              requestType: type
-            }),
-          });
+    
+        // Function to send a request to your PHP API
+        const requestDance = async (dance) => {
+          setModal(<RequestModal songId={1} isVisible={true} onClose={() => {setModal(null)}} handleRequest={(type) => {
+            if (!username) {
+              setModal(<UsernameModal onClose={(username) => {
+                setUsername(username)
+                sendRequest(username, dance);
+                setModal(null)}}></UsernameModal>)
+            } else {
+              sendRequest(username, dance, type);
+              setModal(null)
+            }
           
-          // Parse and log the response JSON
-          const responseData = await response.json();
           
-          if (response.ok) {
-            console.log('Request sent successfully:', responseData);
-          } else {
-            console.error('Failed to send request:', responseData);
-          }
-        } catch (error) {
-          console.error('Error sending request:', error);
+          }}></RequestModal>)
         }
-      };
+    
+        const sendRequest = async (user, dance, type) => {
+          console.log("deviceID: ", deviceId)
+          try {
+            const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                command: 'AddRequest', // Ensure the command is specified
+                username: user,
+                name: dance.name,
+                link: dance.link,
+                song: dance.song,
+                authorDate: dance.authorDate,
+                count: dance.count,
+                difficulty: dance.difficulty,
+                requestType: type,
+                id: deviceId
+              }),
+            });
+            
+            // Parse and log the response JSON
+            const responseData = await response.json();
+            
+            if (response.ok) {
+              console.log('Request sent successfully:', responseData);
+            } else {
+              console.error('Failed to send request:', responseData);
+            }
+          } catch (error) {
+            console.error('Error sending request:', error);
+          }
+        };
 
   
 

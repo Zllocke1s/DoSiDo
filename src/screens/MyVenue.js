@@ -17,7 +17,7 @@ const MyVenue = ({ navigation }) => {
   const [dances, setDances] = useState([]);
   const [savedDances, setSavedDances] = useState([]);
   const [fullscreenModal, setModal] = useState(null)
-  const { username, setUsername, id } = useUser();
+  const { username, setUsername, deviceId } = useUser();
   const [playlists, setPlaylists] = useState({});
 
 
@@ -221,6 +221,7 @@ const MyVenue = ({ navigation }) => {
     Linking.openURL(link);
   };
 
+
         // Function to send a request to your PHP API
         const requestDance = async (dance) => {
           setModal(<RequestModal songId={1} isVisible={true} onClose={() => {setModal(null)}} handleRequest={(type) => {
@@ -239,6 +240,7 @@ const MyVenue = ({ navigation }) => {
         }
     
         const sendRequest = async (user, dance, type) => {
+          console.log("deviceID: ", deviceId)
           try {
             const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
               method: 'POST',
@@ -254,7 +256,8 @@ const MyVenue = ({ navigation }) => {
                 authorDate: dance.authorDate,
                 count: dance.count,
                 difficulty: dance.difficulty,
-                requestType: type
+                requestType: type,
+                id: deviceId
               }),
             });
             
@@ -270,6 +273,7 @@ const MyVenue = ({ navigation }) => {
             console.error('Error sending request:', error);
           }
         };
+
 
     
     
