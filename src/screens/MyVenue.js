@@ -10,6 +10,7 @@ import { UsernameModal } from '../components/UsernameModal';
 import { CustomModal } from '../components/CustomModal';
 import { PlaylistModal } from '../components/PlaylistModal';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { EntryCodeModal } from '../components/EntryCodeModal';
 
 
 const MyVenue = ({ navigation }) => {
@@ -19,7 +20,52 @@ const MyVenue = ({ navigation }) => {
   const [fullscreenModal, setModal] = useState(null)
   const { username, setUsername, deviceId } = useUser();
   const [playlists, setPlaylists] = useState({});
+  const [isApproved, setIsApproved] = useState(false);
+  const [entryCode, setEntryCode] = useState('');
 
+
+    // Check approval state on component mount
+    useEffect(() => {
+      const checkApproval = async () => {
+        try {
+          const approved = await AsyncStorage.getItem('entryApproved');
+          if (approved === 'true') {
+            setIsApproved(true);
+          } else {
+            showEntryCodeModal();
+          }
+        } catch (error) {
+          console.error('Error checking approval state:', error);
+        }
+      };
+  
+      checkApproval();
+    }, []);
+
+    
+    // Show entry code modal
+  const showEntryCodeModal = () => {
+    setModal(
+      <EntryCodeModal onClose={(code) => {handleEntryCodeSubmit(code)}}/>
+    );
+  };
+
+    // Validate and save entry code
+    const handleEntryCodeSubmit = async (code) => {
+      const validCode = 'redrock2025'; // Replace with your actual validation logic
+      if (code === validCode) {
+        try {
+          await AsyncStorage.setItem('entryApproved', 'true');
+          setIsApproved(true);
+          setModal(null);
+        } catch (error) {
+          console.error('Error saving approval state:', error);
+        }
+      } else {
+        alert('Invalid code: ' + JSON.stringify(code) + '. Please try again.');
+      }
+    };
+  
 
   const loadPlaylists = async () => {
     try {
@@ -348,6 +394,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
+    flexShrink: 0, // Prevent shrinking
     marginBottom: 20,
     backgroundColor: '#fdf5e6', // Light warm color for search bar background
   },

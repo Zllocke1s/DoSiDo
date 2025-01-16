@@ -297,6 +297,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#bca789', // Warm beige color for border
     borderWidth: 1,
+    flexShrink: 0,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 20,

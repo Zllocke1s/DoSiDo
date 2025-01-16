@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ImageBackground } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import backgroundImage from '../../assets/background.jpg'; // Adjust path based on your folder structure
@@ -16,10 +16,12 @@ export const MainScreen = ({navigation}) => {
   const { username } = useUser();
 
   return (
+    <SafeAreaView style={styles.background}>
     <Tab.Navigator
     initialRouteName="MyDances"
       screenOptions={({ route }) => ({
         headerShown: false,
+
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'My Venue') {
@@ -39,6 +41,8 @@ export const MainScreen = ({navigation}) => {
           backgroundColor: '#FAEBD7',
           borderTopWidth: 0,
           elevation: 5,
+          paddingBottom: 20,
+          height: 70
         },
         tabBarLabelStyle: {
           fontSize: 14,
@@ -54,6 +58,8 @@ export const MainScreen = ({navigation}) => {
       <Tab.Screen name="Requests" component={RequestList} />
       )}
     </Tab.Navigator>
+    </SafeAreaView>
+
   );
 };
 
