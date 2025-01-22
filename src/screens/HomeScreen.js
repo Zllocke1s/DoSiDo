@@ -34,6 +34,7 @@ export const MainScreen = ({navigation}) => {
       fontSize: 24,
       fontWeight: 'bold',
       color: theme.textColor,
+      textShadowColor: '#000',
       textShadowOffset: { width: 2, height: 2 },
       textShadowRadius: 4,
       textAlign: 'center',
