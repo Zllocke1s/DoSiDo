@@ -8,15 +8,41 @@ import MyDances from './MyDances';
 import AllDances from './AllDances';
 import RequestList from './RequestList';
 import { useUser } from '../UserContext';
+import { useTheme } from '../ThemeContext';
 
 const Tab = createBottomTabNavigator();
 
 export const MainScreen = ({navigation}) => {
 
   const { username } = useUser();
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    background: {
+      flex: 1,
+      resizeMode: 'cover',
+      justifyContent: 'center',
+      backgroundColor: theme.backgroundColor,
+    },
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 0,
+    },
+    welcomeText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.textColor,
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 4,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
+  });
 
   return (
-    <SafeAreaView style={styles.background}>
+    <SafeAreaView style={[styles.background,  { backgroundColor: theme.headerBackgroundColor || theme.backgroundColor }]}>
     <Tab.Navigator
     initialRouteName="MyDances"
       screenOptions={({ route }) => ({
@@ -35,10 +61,10 @@ export const MainScreen = ({navigation}) => {
           }
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#5a3e36',
-        tabBarInactiveTintColor: '#bca789',
+        tabBarActiveTintColor: theme.tabBarActiveTintColor,
+        tabBarInactiveTintColor: theme.tabBarInactiveTintColor,
         tabBarStyle: {
-          backgroundColor: '#FAEBD7',
+          backgroundColor: theme.backgroundColor,
           borderTopWidth: 0,
           elevation: 5,
           paddingBottom: 20,
@@ -63,26 +89,4 @@ export const MainScreen = ({navigation}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 0,
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-});
+

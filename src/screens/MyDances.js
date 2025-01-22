@@ -7,13 +7,133 @@ import * as Sharing from 'expo-sharing';
 import { RequestModal } from '../components/RequestModal';
 import { UsernameModal } from '../components/UsernameModal';
 import { useUser } from '../UserContext';
+import { useTheme } from '../ThemeContext';
 
 const MyDances = ({navigation}) => {
   const [playlists, setPlaylists] = useState({});
   const [currentPlaylist, setCurrentPlaylist] = useState(null); // Track the current playlist
   const [fullscreenModal, setModal] = useState(null);
   const { username, setUsername, deviceId } = useUser();
+  const { theme } = useTheme();
 
+  const styles =
+    StyleSheet.create({
+      container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: theme.backgroundColor, // Theme-based background color
+      },
+      title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+      },
+      backButton: {
+        backgroundColor: theme.buttonBackgroundColor, // Theme-based button background color
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 20,
+      },
+      backButtonText: {
+        color: theme.buttonTextColor || '#FFF', // Theme-based button text color
+        fontWeight: 'bold',
+        fontSize: 16,
+      },
+      playlistList: {
+        paddingBottom: 20,
+      },
+      playlistCard: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: theme.cardBackgroundColor, // Theme-based card background color
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 15,
+        shadowColor: theme.shadowColor, // Theme-based shadow color
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      usernameInput: {
+        color: theme.textColor
+      },
+      playlistInfo: {
+        flex: 1,
+      },
+      playlistName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: theme.textColor, // Theme-based text color
+      },
+      playlistCount: {
+        fontSize: 14,
+        color: theme.textColor, // Theme-based text color
+      },
+      deleteButton: {
+        backgroundColor: theme.deleteButtonBackground || '#E57373', // Theme-based delete button background
+        padding: 10,
+        borderRadius: 5,
+      },
+      noPlaylists: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+      },
+      danceList: {
+        paddingBottom: 20,
+      },
+      danceCard: {
+        backgroundColor: theme.cardBackgroundColor, // Theme-based card background color
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 15,
+        shadowColor: theme.shadowColor, // Theme-based shadow color
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      danceName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: theme.textColor, // Theme-based text color
+      },
+      danceDetails: {
+        fontSize: 14,
+        color: theme.textColor, // Theme-based text color
+        marginTop: 3,
+      },
+      removeButton: {
+        backgroundColor: theme.deleteButtonBackground || '#E57373', // Theme-based delete button background
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginTop: 10,
+      },
+      removeButtonText: {
+        color: theme.buttonTextColor || '#FFF', // Theme-based button text color
+        fontWeight: 'bold',
+        fontSize: 14,
+      },
+      cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      actionButtonIcon: {
+        marginHorizontal: 5,
+      },
+      actionButtons: {
+        flexDirection: 'row',
+      },
+    });
+  
 
   // Use useFocusEffect to reload playlists when the screen is focused
   useFocusEffect(
@@ -151,6 +271,7 @@ const MyDances = ({navigation}) => {
                 <TextInput
           style={styles.usernameInput}
           placeholder="Enter username"
+          placeholderTextColor={theme.textColor}
           value={username}
           onChangeText={(text) => setUsername(text)}
         />
@@ -172,15 +293,15 @@ const MyDances = ({navigation}) => {
                       //Todo Add unsave
                       removeDanceFromPlaylist(dance.name)
                     }}>
-                      <MaterialIcons name="bookmark" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                      <MaterialIcons name="bookmark" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
                   
                     <TouchableOpacity onPress={() => shareDance(dance.link)}>
-                      <MaterialIcons name="share" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                      <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
                     { true && 
                     <TouchableOpacity onPress={() => requestDance(dance)}>
-                        <MaterialIcons name="send" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                        <MaterialIcons name="send" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                       </TouchableOpacity>}
                   </View>
                 </View>
@@ -222,117 +343,6 @@ const MyDances = ({navigation}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#FAEBD7',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#5a3e36',
-  },
-  backButton: {
-    backgroundColor: '#5a3e36',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  backButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  playlistList: {
-    paddingBottom: 20,
-  },
-  playlistCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#e6ccb2',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: '#8b6b61',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  playlistInfo: {
-    flex: 1,
-  },
-  playlistName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#5a3e36',
-  },
-  playlistCount: {
-    fontSize: 14,
-    color: '#5a3e36',
-  },
-  deleteButton: {
-    backgroundColor: '#E57373',
-    padding: 10,
-    borderRadius: 5,
-  },
-  noPlaylists: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#5a3e36',
-  },
-  danceList: {
-    paddingBottom: 20,
-  },
-  danceCard: {
-    backgroundColor: '#e6ccb2',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: '#8b6b61',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  danceName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#5a3e36',
-  },
-  danceDetails: {
-    fontSize: 14,
-    color: '#5a3e36',
-    marginTop: 3,
-  },
-  removeButton: {
-    backgroundColor: '#E57373',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  removeButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  actionButtonIcon: {
-    marginHorizontal: 5,
-  },  actionButtons: {
-    flexDirection: 'row',
-  },
-});
+
 
 export default MyDances;

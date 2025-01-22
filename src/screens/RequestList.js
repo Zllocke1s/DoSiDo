@@ -1,12 +1,94 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, TouchableOpacity, Linking } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../ThemeContext';
 
 const RequestList = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('play'); // Default filter is 'play'
+  const { theme } = useTheme();
 
+  const styles =
+    StyleSheet.create({
+      container: {
+        flex: 1,
+        paddingHorizontal: 20,
+        backgroundColor: theme.backgroundColor, // Theme-based background color
+      },
+      title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginTop: 50,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+      },
+      toggleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 20,
+      },
+      toggleButton: {
+        padding: 10,
+        marginHorizontal: 5,
+        backgroundColor: theme.cardBackgroundColor, // Theme-based button background
+        borderRadius: 5,
+      },
+      activeButton: {
+        backgroundColor: theme.activeButtonColor || theme.textColor, // Theme-based active button background
+      },
+      toggleText: {
+        fontSize: 16,
+        color: theme.textColor, // Theme-based text color
+      },
+      activeText: {
+        color: theme.activeTextColor || '#FFF8E1', // Theme-based active text color
+      },
+      requestList: {
+        paddingBottom: 20,
+      },
+      requestCard: {
+        backgroundColor: theme.cardBackgroundColor, // Theme-based card background color
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 15,
+        shadowColor: theme.shadowColor, // Theme-based shadow color
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      songName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        color: theme.textColor, // Theme-based text color
+      },
+      details: {
+        fontSize: 14,
+        color: theme.textColor, // Theme-based text color
+        marginBottom: 3,
+      },
+      requestCount: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: theme.textColor, // Theme-based text color
+        marginTop: 10,
+      },
+      noRequests: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+        marginTop: 20,
+      },
+      loading: {
+        flex: 1,
+        justifyContent: 'center',
+      },
+    });
+  
+  
   const fetchRequests = async () => {
     setLoading(true);
     try {
@@ -134,82 +216,5 @@ const RequestList = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: '#FAEBD7',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 50,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#5a3e36',
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  toggleButton: {
-    padding: 10,
-    marginHorizontal: 5,
-    backgroundColor: '#e6ccb2',
-    borderRadius: 5,
-  },
-  activeButton: {
-    backgroundColor: '#5a3e36',
-  },
-  toggleText: {
-    fontSize: 16,
-    color: '#5a3e36',
-  },
-  activeText: {
-    color: '#FFF8E1',
-  },
-  requestList: {
-    paddingBottom: 20,
-  },
-  requestCard: {
-    backgroundColor: '#e6ccb2',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: '#8b6b61',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  songName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#5a3e36',
-  },
-  details: {
-    fontSize: 14,
-    color: '#5a3e36',
-    marginBottom: 3,
-  },
-  requestCount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#5a3e36',
-    marginTop: 10,
-  },
-  noRequests: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#5a3e36',
-    marginTop: 20,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-});
 
 export default RequestList;

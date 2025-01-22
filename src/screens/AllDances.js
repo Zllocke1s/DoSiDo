@@ -9,6 +9,7 @@ import {RequestModal} from '../components/RequestModal'
 import { UsernameModal } from '../components/UsernameModal';
 import { CustomModal } from '../components/CustomModal';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useTheme } from '../ThemeContext';
 
 const AllDances = () => {
   const [search, setSearch] = useState('');
@@ -18,7 +19,78 @@ const AllDances = () => {
   const [fullscreenModal, setModal] = useState(null)
   const [playlists, setPlaylists] = useState({});
   const [playlistName, setPlaylistName] = React.useState("")
+  const { theme } = useTheme();
 
+  const styles =
+    StyleSheet.create({
+      container: {
+        flex: 1,
+        paddingHorizontal: 20,
+        backgroundColor: theme.backgroundColor, // Theme-based background color
+      },
+      title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginTop: 30,
+        marginBottom: 30, // Increased padding for more spacing
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+      },
+      searchBar: {
+        height: 40,
+        borderColor: theme.borderColor, // Theme-based border color
+        borderWidth: 1,
+        flexShrink: 0,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+        backgroundColor: theme.cardBackgroundColor, // Theme-based search bar background
+      },
+      danceList: {
+        paddingBottom: 20,
+      },
+      danceCard: {
+        backgroundColor: theme.cardBackgroundColor, // Theme-based card background color
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 15,
+        shadowColor: theme.shadowColor, // Theme-based shadow color
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      danceName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        color: theme.textColor, // Theme-based text color
+        flex: 1,
+      },
+      danceDetails: {
+        fontSize: 14,
+        marginBottom: 3,
+        color: theme.textColor, // Theme-based text color
+      },
+      actionButtons: {
+        flexDirection: 'row',
+      },
+      actionButtonIcon: {
+        marginHorizontal: 5,
+      },
+      noResults: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: theme.textColor, // Theme-based text color
+        marginTop: 20,
+      },
+    });
+  
     // Use useFocusEffect to reload playlists when the screen is focused
     useFocusEffect(
       React.useCallback(() => {
@@ -235,6 +307,7 @@ const AllDances = () => {
           style={styles.searchBar}
           placeholder="Search dances..."
           value={search}
+          placeholderTextColor={theme.textColor}
           onChangeText={text => setSearch(text)}
         />
         <ScrollView contentContainerStyle={styles.danceList}>
@@ -250,17 +323,17 @@ const AllDances = () => {
                       <MaterialIcons
                         name={savedDances.find(savedDance => savedDance.link === dance.link) ? "bookmark" : "bookmark-border"}
                         size={24}
-                        color="#5a3e36"
+                        color={theme.textColor}
                         style={styles.actionButtonIcon}
                       />
                     </TouchableOpacity>
                    
                     <TouchableOpacity onPress={() => shareDance(dance.link)}>
-                      <MaterialIcons name="share" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                      <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
                     { username!="" && 
                     <TouchableOpacity onPress={() => requestDance(dance)}>
-                        <MaterialIcons name="send" size={24} color="#5a3e36" style={styles.actionButtonIcon} />
+                        <MaterialIcons name="send" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                       </TouchableOpacity>}
                   </View>
                 </View>
@@ -279,73 +352,5 @@ const AllDances = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: '#FAEBD7', // Warm eggshell color
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 30,
-    marginBottom: 30, // Increased padding for more spacing
-    textAlign: 'center',
-    color: '#5a3e36', // Warm dark brown color for the title
-  },
-  searchBar: {
-    height: 40,
-    borderColor: '#bca789', // Warm beige color for border
-    borderWidth: 1,
-    flexShrink: 0,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: '#fdf5e6', // Light warm color for search bar background
-  },
-  danceList: {
-    paddingBottom: 20,
-  },
-  danceCard: {
-    backgroundColor: '#e6ccb2', // Darker warm beige color for the card background
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: '#8b6b61', // Warm shadow color
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  danceName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#5a3e36', // Warm dark brown color for the dance name
-    flex: 1,
-  },
-  danceDetails: {
-    fontSize: 14,
-    marginBottom: 3,
-    color: '#5a3e36', // Warm dark brown color for the details
-  },
-  actionButtons: {
-    flexDirection: 'row',
-  },
-  actionButtonIcon: {
-    marginHorizontal: 5,
-  },
-  noResults: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#5a3e36',
-    marginTop: 20,
-  },
-});
 
 export default AllDances;
