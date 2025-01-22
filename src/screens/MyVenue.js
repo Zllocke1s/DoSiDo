@@ -428,10 +428,9 @@ StyleSheet.create({
                     <TouchableOpacity onPress={() => shareDance(dance.link)}>
                       <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
-                    { username!="" && 
                     <TouchableOpacity onPress={() => requestDance(dance)}>
                         <MaterialIcons name="send" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
-                      </TouchableOpacity>}
+                      </TouchableOpacity>
                   </View>
                 </View>
                 <Text style={styles.danceDetails}>Author/Date: {dance.authorDate}</Text>

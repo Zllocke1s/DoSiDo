@@ -26,7 +26,7 @@ export const lightTheme = {
   
     // Overlay and Modal Colors
     overlayColor: 'rgba(60, 47, 42, 0.8)', // Semi-transparent espresso overlay
-    modalBackgroundColor: '#5C4333', // Light cream for modal background
+    modalBackgroundColor: '#e6ccb2', // Light cream for modal background
   
     // Cancel Button
     cancelTextColor: '#806A5A', // Muted taupe for cancel button text

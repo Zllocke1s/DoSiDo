@@ -36,7 +36,7 @@ export const CustomModal = ({ title, body, options, handleRequest, onClose, clos
       },
       message: {
         fontSize: 16,
-        color: theme.secondaryTextColor || '#3E2723', // Theme-based message text color
+        color: theme.textColor || '#5C4033', // Theme-based message text color
         marginBottom: 20,
         textAlign: 'center',
       },
