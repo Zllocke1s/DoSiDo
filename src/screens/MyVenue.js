@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, Modal, StyleSheet, TextInput, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 import * as Sharing from 'expo-sharing';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -12,6 +12,15 @@ import { PlaylistModal } from '../components/PlaylistModal';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import { EntryCodeModal } from '../components/EntryCodeModal';
 import { useTheme } from '../ThemeContext';
+  
+const sampleDanceData = {
+  name: 'Salsa Night',
+  authorDate: 'John Doe / 2025',
+  count: 123,
+  difficulty: 'Intermediate',
+  song: 'Salsa Fiesta',
+  link: 'https://www.example.com',
+};
 
 
 const MyVenue = ({ navigation }) => {
@@ -24,11 +33,125 @@ const MyVenue = ({ navigation }) => {
   const [isApproved, setIsApproved] = useState(false);
   const [entryCode, setEntryCode] = useState('');
   const { theme } = useTheme();
+  const [isNotificationVisible, setNotificationVisible] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
 
+   // Fetch notifications from the server
+   const fetchNotifications = async () => {
+    try {
+      const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          command: 'GetNotifications',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log(data)
+      setNotifications(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+  
+
+  const groupNotificationsByDate = () => {
+    return notifications.reduce((groups, notification) => {
+      const date = notification.date;
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(notification);
+      return groups;
+    }, {});
+  };
   
 const styles = 
 StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  notificationButton: {
+    padding: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: theme.backgroundColor,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: theme.textColor,
+  },
+  notificationText: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: theme.textColor,
+  },
+  notificationSection: {
+    marginBottom: 20,
+  },
+  notificationDate: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: theme.textColor,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.borderColor,
+    paddingBottom: 5,
+  },
+  notificationCard: {
+    backgroundColor: theme.cardBackgroundColor,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: theme.textColor,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  notificationText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: theme.textColor,
+  },
+  
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: theme.borderColor,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: theme.textColor,
+  },  
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -44,14 +167,24 @@ StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: theme.borderColor, // Theme-based border color
+    flex: 0.9,
+    borderColor: theme.borderColor,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    flexShrink: 0, // Prevent shrinking
+    flexShrink: 0,
     marginBottom: 20,
-    backgroundColor: theme.cardBackgroundColor, // Theme-based search bar background
+    backgroundColor: theme.cardBackgroundColor,
+    color: theme.textColor
   },
+  clearButton: {
+    flex: 0.05,
+    paddingHorizontal: 10, // Add padding for better appearance
+    minWidth: 50,          // Ensure the button is wide enough for "Clear"
+    alignItems: 'center',  // Center the text horizontally
+    justifyContent: 'center', // Center the text vertically
+  },
+  
   danceList: {
     paddingBottom: 20,
   },
@@ -235,7 +368,7 @@ StyleSheet.create({
 
       try {
         while (hasMore) {
-          console.log(`Fetching dance data for page ${currentPage}...`);
+         // console.log(`Fetching dance data for page ${currentPage}...`);
           const response = await fetch(`https://www.outpostorganizer.com/cnproxy.php`, {
             method: "POST",
             headers: {
@@ -254,11 +387,11 @@ StyleSheet.create({
 
           const html = await response.text();
           const listItems = html.match(/<div class="listitem".*?<\/div>\s*<\/div>/gs);
-          console.log(response)
+        //  console.log(response)
           if (listItems && listItems.length > 0) {
-            console.log(`Found ${listItems.length} list items on page ${currentPage}. Parsing...`);
+         //   console.log(`Found ${listItems.length} list items on page ${currentPage}. Parsing...`);
             listItems.forEach((item, index) => {
-              console.log(`Parsing item ${index + 1} on page ${currentPage}`);
+         //     console.log(`Parsing item ${index + 1} on page ${currentPage}`);
               try {
                 const linkMatch = item.match(/(\/stepsheets\/.*?)['"]/);
                 const titleMatch = item.match(/<span class="listTitleColor1">(.*?)<\/span>/);
@@ -268,7 +401,7 @@ StyleSheet.create({
                 const songMatch = item.match(/Music:\s*([^<]*)/);
 
                 const link = linkMatch ? `https://www.copperknob.co.uk${linkMatch[1]}` : 'N/A';
-                console.log(`Parsed link: ${link}`);
+           //     console.log(`Parsed link: ${link}`);
                 const name = titleMatch ? titleMatch[1] : 'Unnamed Dance';
                 const authorDate = authorDateMatch ? authorDateMatch[1] : 'Unknown Author/Date';
                 const count = countMatch ? countMatch[1] : 'N/A';
@@ -284,7 +417,7 @@ StyleSheet.create({
                   song,
                   link,
                 });
-                console.log(`Item ${index + 1} on page ${currentPage} parsed successfully.`);
+       //         console.log(`Item ${index + 1} on page ${currentPage} parsed successfully.`);
               } catch (parseError) {
                 console.warn(`Failed to parse item ${index + 1} on page ${currentPage}:`, parseError);
               }
@@ -400,7 +533,13 @@ StyleSheet.create({
   return (
     <MenuProvider>
       <View style={styles.container}>
-        <Text style={styles.title}>Red Rock Saloon</Text>
+      <View style={styles.header}>
+  <Text style={styles.title}>Red Rock Saloon</Text>
+  <TouchableOpacity onPress={() => setNotificationVisible(true)} style={styles.notificationButton}>
+    <MaterialIcons name="notifications" size={28} color={theme.textColor} />
+  </TouchableOpacity>
+</View>
+<View style={{flexDirection: "row", display: "flex", justifyContent: "space-between"}}>
         <TextInput
           style={styles.searchBar}
           placeholder="Search dances..."
@@ -408,6 +547,13 @@ StyleSheet.create({
           value={search}
           onChangeText={text => setSearch(text)}
         />
+<TouchableOpacity 
+  onPress={() => { setSearch("") }} 
+  style={[styles.searchBar, styles.clearButton]}
+>
+  <Text style={{ color: theme.textColor }}>Clear</Text>
+</TouchableOpacity>
+        </View>
         <ScrollView contentContainerStyle={styles.danceList}>
         {fullscreenModal}
           {filteredDances.length > 0 ? (
@@ -443,6 +589,82 @@ StyleSheet.create({
             <Text style={styles.noResults}>No dances found. Please try again later.</Text>
           )}
         </ScrollView>
+        <Modal
+  visible={isNotificationVisible}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setNotificationVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Notifications</Text>
+      <ScrollView>
+        {Object.entries(groupNotificationsByDate()).map(([date, group]) => (
+          <View key={date} style={styles.notificationSection}>
+            <Text style={styles.notificationDate}>{date}</Text>
+            {group.map(notification => (
+              <TouchableOpacity
+                key={notification.id}
+                style={styles.notificationCard}
+                onPress={notification.dance ? () => openLink(notification.dance.link) : null}
+              >
+                <Text style={styles.notificationText}>{notification.text}</Text>
+                {notification.dance && (
+                  <View style={[styles.danceCard, {borderWidth: 1}]}>
+                    <View style={styles.cardHeader}>
+                      <Text style={styles.danceName} numberOfLines={1}>
+                        {notification.dance.name}
+                      </Text>
+                      <View style={styles.actionButtons}>
+                        <TouchableOpacity onPress={() => toggleSaveDance(notification.dance)}>
+                          <MaterialIcons
+                            name="bookmark-border"
+                            size={24}
+                            color={theme.textColor}
+                            style={styles.actionButtonIcon}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => shareDance(notification.dance.link)}>
+                          <MaterialIcons
+                            name="share"
+                            size={24}
+                            color={theme.textColor}
+                            style={styles.actionButtonIcon}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => requestDance(notification.dance)}>
+                          <MaterialIcons
+                            name="send"
+                            size={24}
+                            color={theme.textColor}
+                            style={styles.actionButtonIcon}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <Text style={styles.danceDetails}>
+                      Author/Date: {notification.dance.authorDate}
+                    </Text>
+                    <Text style={styles.danceDetails}>Count: {notification.dance.count}</Text>
+                    <Text style={styles.danceDetails}>
+                      Difficulty: {notification.dance.difficulty}
+                    </Text>
+                    <Text style={styles.danceDetails}>Song: {notification.dance.song}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+      <TouchableOpacity onPress={() => setNotificationVisible(false)} style={styles.closeButton}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+
       </View>
     </MenuProvider>
   );

@@ -205,19 +205,11 @@ const MyDances = ({navigation}) => {
         };
 
   useEffect(() => {
-    const loadSavedDances = async () => {
-      try {
-        const savedDances = JSON.parse(await AsyncStorage.getItem('savedDances')) || [];
-        setDances(savedDances);
-        console.log('Loaded saved dances:', savedDances);
-      } catch (error) {
-        console.error('Error loading saved dances:', error);
-      }
-    };
+    
 
-    const focusListener = navigation?.addListener('focus', loadSavedDances);
+    const focusListener = navigation?.addListener('focus', loadPlaylists);
 
-    loadSavedDances();
+    loadPlaylists()
 
     return focusListener;
   }, []);

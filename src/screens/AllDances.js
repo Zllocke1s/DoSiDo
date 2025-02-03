@@ -6,6 +6,7 @@ import * as Sharing from 'expo-sharing';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../UserContext';
 import {RequestModal} from '../components/RequestModal'
+import { PlaylistModal } from '../components/PlaylistModal';
 import { UsernameModal } from '../components/UsernameModal';
 import { CustomModal } from '../components/CustomModal';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
@@ -38,13 +39,23 @@ const AllDances = () => {
       },
       searchBar: {
         height: 40,
-        borderColor: theme.borderColor, // Theme-based border color
+        flex: 0.9,
+        borderColor: theme.borderColor,
         borderWidth: 1,
-        flexShrink: 0,
         borderRadius: 8,
         paddingHorizontal: 10,
+        flexShrink: 0,
         marginBottom: 20,
-        backgroundColor: theme.cardBackgroundColor, // Theme-based search bar background
+        backgroundColor: theme.cardBackgroundColor,
+        color: theme.textColor
+
+      },
+      clearButton: {
+        flex: 0.05,
+        paddingHorizontal: 10, // Add padding for better appearance
+        minWidth: 50,          // Ensure the button is wide enough for "Clear"
+        alignItems: 'center',  // Center the text horizontally
+        justifyContent: 'center', // Center the text vertically
       },
       danceList: {
         paddingBottom: 20,
@@ -303,13 +314,21 @@ const AllDances = () => {
     <MenuProvider>
       <View style={styles.container}>
         <Text style={styles.title}>All Dances</Text>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search dances..."
-          value={search}
-          placeholderTextColor={theme.textColor}
-          onChangeText={text => setSearch(text)}
-        />
+        <View style={{flexDirection: "row", display: "flex", justifyContent: "space-between"}}>
+                <TextInput
+                  style={styles.searchBar}
+                  placeholder="Search dances..."
+                  placeholderTextColor={theme.textColor}
+                  value={search}
+                  onChangeText={text => setSearch(text)}
+                />
+        <TouchableOpacity 
+          onPress={() => { setSearch("") }} 
+          style={[styles.searchBar, styles.clearButton]}
+        >
+          <Text style={{ color: theme.textColor }}>Clear</Text>
+        </TouchableOpacity>
+                </View>
         <ScrollView contentContainerStyle={styles.danceList}>
         {fullscreenModal}
 
@@ -331,10 +350,10 @@ const AllDances = () => {
                     <TouchableOpacity onPress={() => shareDance(dance.link)}>
                       <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
-                    { username!="" && 
+                     
                     <TouchableOpacity onPress={() => requestDance(dance)}>
                         <MaterialIcons name="send" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
-                      </TouchableOpacity>}
+                      </TouchableOpacity>
                   </View>
                 </View>
                 <Text style={styles.danceDetails}>Author/Date: {dance.authorDate}</Text>

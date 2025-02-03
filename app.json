@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "grooveguide",
-    "slug": "dosido",
+    "name": "stepchique",
+    "slug": "stepchique",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,21 +13,26 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zlaoch.dosido"
+      "bundleIdentifier": "com.zlaoch.dosido",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications.",
+        "UIBackgroundModes": ["remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.zlaoch.dosido"
+      "package": "com.zlaoch.stepchique",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "pwa": {
         "manifest": {
-          "short_name": "MyVenue",
-          "name": "MyVenue App",
+          "short_name": "Step Chique",
+          "name": "Step Chique",
           "start_url": ".",
           "display": "standalone",
           "background_color": "#ffffff",
@@ -49,7 +54,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "625347ae-bdaf-4518-8637-408e676a7d0b"
+        "projectId": "255ceeae-c839-467a-8aca-c597e2ee70c2"
       }
     },
     "runtimeVersion": {
