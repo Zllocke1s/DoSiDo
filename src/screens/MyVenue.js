@@ -14,7 +14,7 @@ import { EntryCodeModal } from '../components/EntryCodeModal';
 import { useTheme } from '../ThemeContext';
 import { getSpotifyPlaylist, getSpotifyPlaylists } from '../utilities/spotifyAPIs';
 import { Buffer } from 'buffer';
-
+import { TouchableWithoutFeedback, Keyboard } from 'react-native'
 
 
 const sampleDanceData = {
@@ -85,163 +85,178 @@ const MyVenue = ({ navigation }) => {
     }, {});
   };
   
-const styles = 
-StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  notificationButton: {
-    padding: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: theme.backgroundColor,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: theme.textColor,
-  },
-  notificationText: {
-    fontSize: 16,
-    marginVertical: 5,
-    color: theme.textColor,
-  },
-  notificationSection: {
-    marginBottom: 20,
-  },
-  notificationDate: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: theme.textColor,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.borderColor,
-    paddingBottom: 5,
-  },
-  notificationCard: {
-    backgroundColor: theme.cardBackgroundColor,
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: theme.textColor,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  notificationText: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: theme.textColor,
-  },
+  const styles = StyleSheet.create({
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    notificationButton: {
+      padding: 10,
+    },
+    notificationText: {
+      fontSize: 16,
+      marginVertical: 5,
+      color: theme.textColor,
+    },
+    notificationSection: {
+      marginBottom: 20,
+    },
+    notificationDate: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      color: theme.textColor,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderColor,
+      paddingBottom: 5,
+    },
+    notificationCard: {
+      backgroundColor: theme.cardBackgroundColor,
+      borderRadius: 10,
+      padding: 15,
+      marginBottom: 10,
+      shadowColor: theme.textColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center', // Centers the modal in the screen
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent overlay
+    },
+    modalContent: {
+      width: '90%', // Prevents taking the full screen width
+      maxHeight: '80%', // Limits height to avoid full-screen takeover
+      backgroundColor: theme.backgroundColor,
+      borderRadius: 15,
+      padding: 20,
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color:  theme.textColor,
+      marginBottom: 10,
+      justifyContent: 'space-between',
+    },
+    playlistContainer: {
+      marginBottom: 20,
+    },
+    playlistList: {
+      paddingBottom: 20,
+      paddingTop: 10, // Adds some space at the top
+    },
+    trackList: {
+      maxHeight: 250, // Prevents the inner FlatList from expanding too much
+    },
+    trackItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    albumArt: {
+      width: 50,
+      height: 50,
+      borderRadius: 5,
+    },
+    trackName: {
+      fontSize: 16,
+      color: theme.textColor,
+    },
+    artistName: {
+      fontSize: 14,
+      color: 'gray',
+    },
+    closeButton: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+    },
+    closeButtonText: {
+      fontSize: 16,
+      color: theme.textColor,
+    },
+    container: {
+      flex: 1,
+      paddingHorizontal: 20,
+      backgroundColor: theme.backgroundColor, // Theme-based background color
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginTop: 50,
+      marginBottom: 30, // Increased padding for more spacing
+      textAlign: 'center',
+      color: theme.textColor, // Theme-based text color
+    },
+    searchBar: {
+      height: 40,
+      flex: 0.9,
+      borderColor: theme.borderColor,
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      flexShrink: 0,
+      marginBottom: 20,
+      backgroundColor: theme.cardBackgroundColor,
+      color: theme.textColor,
+    },
+    clearButton: {
+      flex: 0.05,
+      paddingHorizontal: 10, // Add padding for better appearance
+      minWidth: 50, // Ensure the button is wide enough for "Clear"
+      alignItems: 'center', // Center the text horizontally
+      justifyContent: 'center', // Center the text vertically
+    },
+    danceList: {
+      paddingBottom: 20,
+    },
+    danceCard: {
+      backgroundColor: theme.cardBackgroundColor, // Theme-based card background
+      padding: 15,
+      borderRadius: 10,
+      marginBottom: 15,
+      shadowColor: theme.textColor, // Theme-based shadow color
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    danceName: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 5,
+      color: theme.textColor, // Theme-based text color
+      flex: 1,
+    },
+    danceDetails: {
+      fontSize: 14,
+      marginBottom: 3,
+      color: theme.textColor, // Theme-based text color
+    },
+    actionButtons: {
+      flexDirection: 'row',
+    },
+    actionButtonIcon: {
+      marginHorizontal: 5,
+    },
+    noResults: {
+      fontSize: 16,
+      textAlign: 'center',
+      color: theme.textColor, // Theme-based text color
+      marginTop: 20,
+    },
+  });
   
-  closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: theme.borderColor,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: theme.textColor,
-  },  
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: theme.backgroundColor, // Theme-based background color
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 50,
-    marginBottom: 30, // Increased padding for more spacing
-    textAlign: 'center',
-    color: theme.textColor, // Theme-based text color
-  },
-  searchBar: {
-    height: 40,
-    flex: 0.9,
-    borderColor: theme.borderColor,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    flexShrink: 0,
-    marginBottom: 20,
-    backgroundColor: theme.cardBackgroundColor,
-    color: theme.textColor
-  },
-  clearButton: {
-    flex: 0.05,
-    paddingHorizontal: 10, // Add padding for better appearance
-    minWidth: 50,          // Ensure the button is wide enough for "Clear"
-    alignItems: 'center',  // Center the text horizontally
-    justifyContent: 'center', // Center the text vertically
-  },
-  
-  danceList: {
-    paddingBottom: 20,
-  },
-  danceCard: {
-    backgroundColor: theme.cardBackgroundColor, // Theme-based card background
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: theme.textColor, // Theme-based shadow color
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  danceName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: theme.textColor, // Theme-based text color
-    flex: 1,
-  },
-  danceDetails: {
-    fontSize: 14,
-    marginBottom: 3,
-    color: theme.textColor, // Theme-based text color
-  },
-  actionButtons: {
-    flexDirection: 'row',
-  },
-  actionButtonIcon: {
-    marginHorizontal: 5,
-  },
-  noResults: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: theme.textColor, // Theme-based text color
-    marginTop: 20,
-  },
-  modalTitle: { fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 10, justifyContent: "space-between" },
-  trackItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  albumArt: { width: 50, height: 50, borderRadius: 5 },
-  trackName: { fontSize: 16, color: "white" },
-  artistName: { fontSize: 14, color: "gray" },
-  closeButton: { position: "absolute", top: 10, right: 10 },
-  
-});
 
 
     // Check approval state on component mount
@@ -480,6 +495,7 @@ StyleSheet.create({
     if (data) {
       console.log("data", data)
       setPlaylistData(data);
+      setNotificationVisible(false)
     }
   };
   
@@ -701,22 +717,31 @@ StyleSheet.create({
     </View>
   </View>
 </Modal>
-<Modal visible={isPlaylistVisible} transparent={true} animationType="none">
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <TouchableOpacity onPress={() => setPlaylistVisible(false)} style={styles.closeButton}>
-        <MaterialIcons name="close" size={28} color="white" />
-      </TouchableOpacity>
+<Modal
+  visible={isPlaylistVisible}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setPlaylistVisible(false)}
+>
+  {/* Close modal when tapping outside */}
+  <TouchableWithoutFeedback onPress={() => setPlaylistVisible(false)}>
+    <View style={styles.modalContainer}>
+      {/* Prevent the inner content from closing the modal */}
+      <TouchableWithoutFeedback>
+        <View style={styles.modalContent}>
+          <TouchableOpacity onPress={() => setPlaylistVisible(false)} style={styles.closeButton}>
+            <MaterialIcons name="close" size={28} color="white" />
+          </TouchableOpacity>
 
-      {playlistData ? (
-        <ScrollView style={{ height: 300, marginTop: 40 }}>
+          {playlistData ? (
+        <ScrollView style={{ height: 500, marginTop: 40 }}>
         {
         playlistData.map((playlistData) => (
         <>
           <Text style={styles.modalTitle}>{playlistData.name}</Text>
           <FlatList
             data={playlistData.tracks.items}
-            keyExtractor={(item) => item.track.id}
+            keyExtractor={(item, index) => `${item.track.id}-${index}`}
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.trackItem} onPress={() => openLink(item.track.uri)}>
                 <Image source={{ uri: item.track.album.images[0]?.url }} style={styles.albumArt} />
@@ -736,9 +761,14 @@ StyleSheet.create({
        : (
         <ActivityIndicator size="large" color="white" />
       )}
+        </View>
+      </TouchableWithoutFeedback>
     </View>
-  </View>
+  </TouchableWithoutFeedback>
 </Modal>
+
+
+
       </View>
     </MenuProvider>
   );
