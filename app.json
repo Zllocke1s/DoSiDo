@@ -12,8 +12,8 @@
       "backgroundColor": "#FAEBD7"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.zlaoch.dosido",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.zlaoch.stepchique",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications.",
         "UIBackgroundModes": ["remote-notification"]
