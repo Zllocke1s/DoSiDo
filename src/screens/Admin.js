@@ -41,8 +41,7 @@ const Admin = () => {
         backgroundColor: theme.backgroundColor, // Theme-based background color
       },
       input: {
-        height: 40,
-        flex: 0.9,
+        height: 200,
         borderColor: theme.borderColor,
         borderWidth: 1,
         borderRadius: 8,
@@ -63,7 +62,7 @@ const Admin = () => {
     backgroundColor: theme.backgroundColor,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+    padding: 20
   },
   modalTitle: {
     fontSize: 20,
@@ -83,12 +82,21 @@ const Admin = () => {
         flexDirection: 'row',
         justifyContent: 'center',
         marginBottom: 20,
+        width: "100%"
       },
       toggleButton: {
         padding: 10,
         marginHorizontal: 5,
         backgroundColor: theme.cardBackgroundColor, // Theme-based button background
         borderRadius: 5,
+        flex: 0.4,
+        
+      },
+      sendButton: {
+        padding: 10,
+        marginHorizontal: 5,
+        backgroundColor: theme.cardBackgroundColor, // Theme-based button background
+        borderRadius: 5, 
       },
       activeButton: {
         backgroundColor: theme.activeButtonColor || theme.textColor, // Theme-based active button background
@@ -112,6 +120,7 @@ const Admin = () => {
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
+        display: "flex",
         elevation: 3,
       },
       songName: {
@@ -140,6 +149,7 @@ const Admin = () => {
   },
   actionButtons: {
     flexDirection: 'row',
+    width: "100%"
   },
       noRequests: {
         fontSize: 16,
@@ -327,7 +337,7 @@ const Admin = () => {
                                         setSendNotificationModal(true)
                                       }
                                       }>
-                                        <MaterialIcons name="send"  size={24} color={theme.textColor} style={{marginHorizontal: 5, transform: [{rotate: '180deg'}]}} />
+                                        <MaterialIcons name="send"  size={24} color={theme.textColor} style={{marginHorizontal: 5, flex: 0.4, transform: [{rotate: '180deg'}]}} />
                                       </TouchableOpacity>
                                   </View>
                                 </View>
@@ -349,13 +359,13 @@ const Admin = () => {
           <Text style={styles.modalTitle}>Send Notification</Text>
           <View style={styles.toggleContainer}>
           {notificationType == notificationTypes.dance && <TouchableOpacity
-          style={[styles.toggleButton, notificationType === notificationTypes.dance && styles.activeButton]}
+          style={[styles.toggleButton, notificationType === notificationTypes.dance && styles.activeButton, {height: 40}]}
           onPress={() => setNotificationType(notificationTypes.dance)}
         >
           <Text style={[styles.toggleText, notificationType === notificationTypes.dance && styles.activeText]}>Dance Link</Text>
         </TouchableOpacity>}
         <TouchableOpacity
-          style={[styles.toggleButton, notificationType === notificationTypes.playlist && styles.activeButton]}
+          style={[styles.toggleButton, notificationType === notificationTypes.playlist && styles.activeButton, {height: 40}]}
           onPress={() => setNotificationType(notificationTypes.playlist)}
         >
           <Text style={[styles.toggleText, notificationType === notificationTypes.playlist && styles.activeText]}>Playlist Link</Text>
@@ -370,14 +380,16 @@ const Admin = () => {
           <TextInput
             style={styles.input}
             placeholder="Notification Text"
+            placeholderTextColor={theme.textColor + "77"}
             value={notificationText}
             onChangeText={setNotificationText}
             multiline
           />
           {notificationType != notificationTypes.general && 
           <TextInput
-            style={styles.input}
+            style={[styles.input, {height: notificationType != notificationDance.dance ? 40 : 300}]}
             placeholder="Playlist Links (Each on new line)"
+            placeholderTextColor={theme.textColor + "77"}
             value={notificationLink}
             onChangeText={setNotificationLink}
             editable={notificationType != notificationTypes.dance}
@@ -385,7 +397,7 @@ const Admin = () => {
           />}
           
           <TouchableOpacity
-            style={[styles.toggleButton, {width: 70, textAlign: "center", justifyContent: "center", alignItems: "center", alignItems: "center"}]}
+            style={[styles.sendButton, {width: 100, justifyContent: "center", alignContent: "center", alignItems: "center"}]}
             onPress={() => {
               sendNotification();
               setSendNotificationModal(false)}
@@ -395,7 +407,7 @@ const Admin = () => {
           </TouchableOpacity>
           
           <TouchableOpacity onPress={() => setSendNotificationModal(false)} style={styles.closeButton}>
-        <MaterialIcons name="close" size={28} color="white" />
+        <MaterialIcons name="close" size={28} color={theme.textColor} />
       </TouchableOpacity>
           </View>
           </View>
