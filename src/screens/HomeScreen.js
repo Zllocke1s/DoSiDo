@@ -6,7 +6,7 @@ import backgroundImage from '../../assets/background.jpg'; // Adjust path based 
 import MyVenue from './MyVenue';
 import MyDances from './MyDances';
 import AllDances from './AllDances';
-import RequestList from './RequestList';
+import Admin from './Admin';
 import { useUser } from '../UserContext';
 import { useTheme } from '../ThemeContext';
 
@@ -57,8 +57,8 @@ export const MainScreen = ({navigation}) => {
             iconName = 'favorite';
           } else if (route.name === 'All Dances') {
             iconName = 'library-music';
-          } else if (route.name === 'Requests') {
-            iconName = 'send'
+          } else if (route.name === 'Admin') {
+            iconName = 'admin-panel-settings'
           }
           return <MaterialIcons name={iconName} size={size} color={color} />;
         },
@@ -82,7 +82,7 @@ export const MainScreen = ({navigation}) => {
       <Tab.Screen name="All Dances" component={AllDances} />
       {username.includes('Instructor') && (
 
-      <Tab.Screen name="Requests" component={RequestList} />
+      <Tab.Screen name="Admin" component={Admin} />
       )}
     </Tab.Navigator>
     </SafeAreaView>
