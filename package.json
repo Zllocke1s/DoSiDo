@@ -16,6 +16,7 @@
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "axios": "^1.7.7",
+    "buffer": "^6.0.3",
     "cheerio": "^1.0.0",
     "expo": "~51.0.28",
     "expo-notifications": "~0.28.19",

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Modal, StyleSheet, TextInput, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, Image, Modal, StyleSheet, ActivityIndicator, FlatList, TextInput, ScrollView, TouchableOpacity, Linking, Alert, Dimensions } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 import * as Sharing from 'expo-sharing';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../UserContext';
 import {RequestModal} from '../components/RequestModal'
 import { UsernameModal } from '../components/UsernameModal';
@@ -12,7 +12,11 @@ import { PlaylistModal } from '../components/PlaylistModal';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import { EntryCodeModal } from '../components/EntryCodeModal';
 import { useTheme } from '../ThemeContext';
-  
+import { getSpotifyPlaylist, getSpotifyPlaylists } from '../utilities/spotifyAPIs';
+import { Buffer } from 'buffer';
+
+
+
 const sampleDanceData = {
   name: 'Salsa Night',
   authorDate: 'John Doe / 2025',
@@ -35,7 +39,9 @@ const MyVenue = ({ navigation }) => {
   const { theme } = useTheme();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [notifications, setNotifications] = useState([]);
-
+  const [playlistData, setPlaylistData] = useState(null);
+  const [isPlaylistVisible, setPlaylistVisible] = useState(false);
+  
 
    // Fetch notifications from the server
    const fetchNotifications = async () => {
@@ -228,6 +234,13 @@ StyleSheet.create({
     color: theme.textColor, // Theme-based text color
     marginTop: 20,
   },
+  modalTitle: { fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 10, justifyContent: "space-between" },
+  trackItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  albumArt: { width: 50, height: 50, borderRadius: 5 },
+  trackName: { fontSize: 16, color: "white" },
+  artistName: { fontSize: 14, color: "gray" },
+  closeButton: { position: "absolute", top: 10, right: 10 },
+  
 });
 
 
@@ -462,9 +475,20 @@ StyleSheet.create({
     }
   };
 
-
- 
-
+  const goToPlaylist = async (playlistId) => {
+    const data = await getSpotifyPlaylists(playlistId);
+    if (data) {
+      console.log("data", data)
+      setPlaylistData(data);
+    }
+  };
+  
+  useEffect(() => {
+    if (playlistData) {
+      console.log(playlistData)
+      setPlaylistVisible(true);
+    }
+  }, [playlistData]);
 
   const toggleSaveDance = async (dance) => {
       saveToPlaylist(dance)
@@ -526,9 +550,6 @@ StyleSheet.create({
             console.error('Error sending request:', error);
           }
         };
-
-
-    
     
   return (
     <MenuProvider>
@@ -597,18 +618,35 @@ StyleSheet.create({
 >
   <View style={styles.modalContainer}>
     <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Notifications</Text>
-      <ScrollView>
+      <Text style={styles.modalTitle}>Notifications{"  "}
+      <TouchableOpacity onPress={() => Linking.openURL('https://www.facebook.com/groups/linedancingatredrock')}>
+          <MaterialCommunityIcons name="facebook" size={24} color={theme.textColor} style={{marginBottom: 10}}/>
+        </TouchableOpacity></Text>
+      <ScrollView style={{ height: Dimensions.get('window').height - 200 }}>
         {Object.entries(groupNotificationsByDate()).map(([date, group]) => (
           <View key={date} style={styles.notificationSection}>
             <Text style={styles.notificationDate}>{date}</Text>
-            {group.map(notification => (
+            {group.map(notification => {
+              console.log(notification)
+            return(
+              notification.dance.link.includes("general") ? 
+              <TouchableOpacity style={styles.notificationCard}>
+                <Text style={styles.notificationText}>
+                  {Buffer.from(notification.text, 'base64').toString('utf-8')}
+                </Text>
+              </TouchableOpacity> :
+              notification.dance.link.includes("spotify") ? 
+              <TouchableOpacity onPress={() => goToPlaylist(notification.dance.link.split(":").slice(1))} style={styles.notificationCard}>
+                <Text style={[styles.notificationText, {paddingLeft: 30}]}>
+                <MaterialCommunityIcons name="spotify" size={24} color={theme.textColor} style={{position: "absolute", left: 0}}/> {Buffer.from(notification.text, 'base64').toString('utf-8')}
+                </Text>
+                  </TouchableOpacity> :
               <TouchableOpacity
                 key={notification.id}
                 style={styles.notificationCard}
                 onPress={notification.dance ? () => openLink(notification.dance.link) : null}
               >
-                <Text style={styles.notificationText}>{notification.text}</Text>
+                <Text style={styles.notificationText}>{Buffer.from(notification.text, 'base64').toString('utf-8')}</Text>
                 {notification.dance && (
                   <View style={[styles.danceCard, {borderWidth: 1}]}>
                     <View style={styles.cardHeader}>
@@ -653,18 +691,54 @@ StyleSheet.create({
                   </View>
                 )}
               </TouchableOpacity>
-            ))}
+            )})}
           </View>
         ))}
       </ScrollView>
       <TouchableOpacity onPress={() => setNotificationVisible(false)} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>Close</Text>
+        <MaterialIcons name="close" size={28} color="white" />
       </TouchableOpacity>
     </View>
   </View>
 </Modal>
+<Modal visible={isPlaylistVisible} transparent={true} animationType="none">
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <TouchableOpacity onPress={() => setPlaylistVisible(false)} style={styles.closeButton}>
+        <MaterialIcons name="close" size={28} color="white" />
+      </TouchableOpacity>
 
-
+      {playlistData ? (
+        <ScrollView style={{ height: 300, marginTop: 40 }}>
+        {
+        playlistData.map((playlistData) => (
+        <>
+          <Text style={styles.modalTitle}>{playlistData.name}</Text>
+          <FlatList
+            data={playlistData.tracks.items}
+            keyExtractor={(item) => item.track.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.trackItem} onPress={() => openLink(item.track.uri)}>
+                <Image source={{ uri: item.track.album.images[0]?.url }} style={styles.albumArt} />
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.trackName}>{item.track.name}</Text>
+                  <Text style={styles.artistName}>
+                    {item.track.artists.map((artist) => artist.name).join(", ")}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      ))}
+</ScrollView>
+)
+       : (
+        <ActivityIndicator size="large" color="white" />
+      )}
+    </View>
+  </View>
+</Modal>
       </View>
     </MenuProvider>
   );
