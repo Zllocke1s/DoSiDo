@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sharing from 'expo-sharing';
@@ -21,6 +21,7 @@ const AllDances = () => {
   const [playlists, setPlaylists] = useState({});
   const [playlistName, setPlaylistName] = React.useState("")
   const { theme } = useTheme();
+  const [loading, setLoading] = React.useState(false)
 
   const styles =
     StyleSheet.create({
@@ -223,7 +224,7 @@ const AllDances = () => {
     loadPlaylists()
   }, []);
 
-  useEffect(() => {
+
     const fetchDances = async () => {
       try {
         const response = await fetch("https://www.outpostorganizer.com/cnproxy.php", {
@@ -288,10 +289,9 @@ const AllDances = () => {
       } catch (error) {
         console.error('Error fetching and parsing dances:', error);
       }
+      setLoading(false)
     };
 
-    fetchDances();
-  }, [search]);
 
   const toggleSaveDance = async (dance) => {
     saveToPlaylist(dance)
@@ -321,6 +321,11 @@ const AllDances = () => {
                   placeholderTextColor={theme.textColor}
                   value={search}
                   onChangeText={text => setSearch(text)}
+                  onBlur={() => {
+                    setLoading(true)
+                    fetchDances();
+
+                  }}
                 />
         <TouchableOpacity 
           onPress={() => { setSearch("") }} 
@@ -331,7 +336,9 @@ const AllDances = () => {
                 </View>
         <ScrollView contentContainerStyle={styles.danceList}>
         {fullscreenModal}
-
+                  {loading && (
+                          <ActivityIndicator size="large" color={theme.textColor} style={styles.loading} />
+                  )}
           {dances.length > 0 ? (
             dances.map((dance, index) => (
               <TouchableOpacity key={index} onPress={() => openLink(dance.link)} style={styles.danceCard}>
@@ -363,7 +370,7 @@ const AllDances = () => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.noResults}>No dances found. Please try again later.</Text>
+            <Text style={styles.noResults}>No dances found.</Text>
           )}
         </ScrollView>
       </View>

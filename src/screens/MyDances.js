@@ -14,7 +14,8 @@ const MyDances = ({navigation}) => {
   const [currentPlaylist, setCurrentPlaylist] = useState(null); // Track the current playlist
   const [fullscreenModal, setModal] = useState(null);
   const { username, setUsername, deviceId } = useUser();
-  const { theme } = useTheme();
+  const [tempUsername, setTempUserName] = useState("")
+    const { theme } = useTheme();
 
   const styles =
     StyleSheet.create({
@@ -255,7 +256,13 @@ const MyDances = ({navigation}) => {
     setPlaylists(updatedPlaylists);
     await AsyncStorage.setItem('playlists', JSON.stringify(updatedPlaylists));
   };
-  
+
+
+  useEffect(() => {
+    if(tempUsername=="") {
+      setTempUserName(username)
+    }
+  }, [username])
 
   return (
     <View style={styles.container}>
@@ -264,8 +271,12 @@ const MyDances = ({navigation}) => {
           style={styles.usernameInput}
           placeholder="Enter username"
           placeholderTextColor={theme.textColor}
-          value={username}
-          onChangeText={(text) => setUsername(text)}
+          value={tempUsername}
+          onChangeText={(text) => {
+            setTempUserName(text)
+          }}
+          onSubmitEditing={() => setUsername(tempUsername)}
+          onBlur={() => setUsername(tempUsername)} // This updates when clicking out
         />
       {currentPlaylist ? (
         // Playlist View
