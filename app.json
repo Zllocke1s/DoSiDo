@@ -19,6 +19,8 @@
         "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications.",
         "UIBackgroundModes": [
           "remote-notification",
+          "remote-notification",
+          "remote-notification",
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -66,7 +68,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/625347ae-bdaf-4518-8637-408e676a7d0b"
+      "url": "https://u.expo.dev/255ceeae-c839-467a-8aca-c597e2ee70c2"
     },
     "owner": "zlaoch"
   }

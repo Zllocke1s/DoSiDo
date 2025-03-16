@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import * as Notifications from 'expo-notifications';
 
@@ -9,6 +10,50 @@ export const UserProvider = ({ children }) => {
   const [username, setUsername] = useState('');
   const [deviceId, setDeviceId] = useState('');
   const [pushToken, setPushToken] = useState('');
+
+
+  async function registerForPushNotificationsAsync() {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        handleRegistrationError('Permission not granted to get push token for push notification!');
+        return;
+      }
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      if (!projectId) {
+        handleRegistrationError('Project ID not found');
+      }
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        console.log(pushTokenString);
+        setPushToken(pushTokenString);
+      } catch (e) {
+        handleRegistrationError(`${e}`);
+      }
+    } else {
+      handleRegistrationError('Must use physical device for push notifications');
+    }
+  }
+  
 
   useEffect(() => {
     const initializeUserContext = async () => {
@@ -24,20 +69,7 @@ export const UserProvider = ({ children }) => {
         }
         setDeviceId(storedDeviceId);
 
-        // Get push notification token
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-        if (finalStatus === 'granted') {
-          const token = (await Notifications.getExpoPushTokenAsync()).data;
-          setPushToken(token);
-          console.log('Push Token:', token);
-        } else {
-          console.warn('Push notifications not enabled.');
-        }
+       registerForPushNotificationsAsync()
       } catch (error) {
         console.error('Error initializing UserContext:', error);
       }
