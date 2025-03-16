@@ -2,7 +2,8 @@
   "expo": {
     "name": "stepchique",
     "slug": "stepchique",
-    "version": "1.0.0",
+    "newArchEnabled": true,
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -25,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.zlaoch.stepchique",
-      "versionCode": 1
+      "versionCode": 110
     },
     "web": {
       "favicon": "./assets/favicon.png",
