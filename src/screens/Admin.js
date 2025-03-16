@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Modal, TextInput, StyleSheet, ScrollView, ActivityIndicator, Alert, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, Modal, TextInput, StyleSheet, ScrollView, ActivityIndicator, Alert, TouchableOpacity, Linking, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -31,6 +32,9 @@ const Admin = () => {
   const [notificationLink, setNotificationLink] = useState('');
   const [notificationType, setNotificationType] = useState(notificationTypes.general);
   const [notificationDance, setNotificationDance] = useState({});
+
+  const [sortAscending, setSortAscending] = useState(true);
+  const [seenRequests, setSeenRequests] = useState(new Set());
 
 
   const styles =
@@ -81,7 +85,7 @@ const Admin = () => {
       },
       toggleContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         marginBottom: 20,
       },
       toggleButton: {
@@ -90,11 +94,23 @@ const Admin = () => {
         backgroundColor: theme.cardBackgroundColor, // Theme-based button background
         borderRadius: 5,
       },
+      
+      sortButton: {
+        padding: 5,
+        marginHorizontal: 5,
+        backgroundColor: theme.cardBackgroundColor, // Theme-based button background
+        borderRadius: 5,
+        textAlign: "center",
+        alignItems: "center",
+        width: 150,
+        position: "absolute",
+        top: 20,
+      },
       activeButton: {
         backgroundColor: theme.activeButtonColor || theme.textColor, // Theme-based active button background
       },
       toggleText: {
-        fontSize: 16,
+        fontSize: 13,
         color: theme.textColor, // Theme-based text color
       },
       activeText: {
@@ -126,6 +142,12 @@ const Admin = () => {
         marginBottom: 3,
       },
       requestCount: {
+        fontSize: 16,
+        color: theme.textColor, // Theme-based text color
+        marginTop: 10,
+      },
+      
+      requestCountHeader: {
         fontSize: 16,
         fontWeight: 'bold',
         color: theme.textColor, // Theme-based text color
@@ -200,27 +222,47 @@ const Admin = () => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
+      // Retrieve previously seen requests
+      const storedSeenRequests = await AsyncStorage.getItem('seenRequests');
+      const seenIds = storedSeenRequests ? new Set(JSON.parse(storedSeenRequests)) : new Set();
+  
       const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
         method: 'POST',
         body: JSON.stringify({
           command: 'GetRequests',
-          requestType: filter, // Send the filter ('teach' or 'play')
+          requestType: filter,
         }),
       });
   
       const responseData = await response.json();
       if (responseData.code === 1) {
-        // Parse user_request_pairs to extract names
         const updatedRequests = responseData.requests.map(request => {
           const requesters = request.user_request_pairs
             ? request.user_request_pairs
-                .split(',') // Split pairs
-                .map(pair => pair.split(':')[1]) // Extract RequestedBy (name)
-                .join(', ') // Rejoin names
+                .split(',')
+                .map(pair => pair.split('%&%')[1])
+                .join('\n')
             : 'N/A';
-          return { ...request, requesters };
+  
+          return { 
+            ...request, 
+            requesters, 
+            newRequest: !seenIds.has(request.Link) // Mark as new if the Link isn't in seenIds
+          };
         });
-        setRequests(updatedRequests);
+  
+        console.log(updatedRequests);
+  
+        // Extract all request Links (since IDs might be reused)
+        const newRequestLinks = updatedRequests.map(req => req.Link);
+  
+        // Merge old and new seen requests, removing duplicates
+        const updatedSeenRequests = new Set([...seenIds, ...newRequestLinks]);
+  
+        // Save the merged list back to AsyncStorage
+        await AsyncStorage.setItem('seenRequests', JSON.stringify([...updatedSeenRequests]));
+  
+        setRequests(updatedRequests.sort((a, b) => sortAscending ? a.id - b.id : b.id - a.id));
       } else {
         setRequests([]);
       }
@@ -231,6 +273,15 @@ const Admin = () => {
     }
   };
   
+  
+  
+
+  const toggleSortOrder = () => {
+    setSortAscending(prev => !prev);
+    setRequests(prevRequests => [...prevRequests].reverse());
+  };
+  
+
 
   const openLink = (link) => {
     Linking.openURL(link);
@@ -253,6 +304,8 @@ const Admin = () => {
         }),
       });
 
+
+      
       const responseData = await response.json();
 
       if (responseData.code === 1) {
@@ -272,9 +325,37 @@ const Admin = () => {
     }, [filter])
   );
 
+  
+  const formatTimestamp = (timestamp) => {
+    const now = new Date();
+    const date = new Date(timestamp);
+  
+    const isSameDay = now.toDateString() === date.toDateString();
+    const isSameWeek = (now - date) / (1000 * 60 * 60 * 24) < 7 && now.getDay() >= date.getDay();
+    const isSameYear = now.getFullYear() === date.getFullYear();
+  
+    if (isSameDay) {
+      return `Today at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+    } else if (isSameWeek) {
+      return new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
+    } else if (isSameYear) {
+      return date.toLocaleDateString('en-US', { month: 'numeric', day: '2-digit' });
+    } else {
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Admin</Text>
+      <TouchableOpacity 
+  style={[styles.sortButton]} 
+  onPress={toggleSortOrder}
+>
+  <Text style={[styles.toggleText, {fontSize: 12}]}>
+    Sort By: {sortAscending ? 'Oldest' : 'Newest'}
+  </Text>
+</TouchableOpacity>
 
       {/* Toggle for Teach and Play Requests */}
       <View style={styles.toggleContainer}>
@@ -311,8 +392,10 @@ const Admin = () => {
                 style={styles.requestCard}
               >
                                 <View style={styles.cardHeader}>
-                                <Text style={styles.songName}>{request.Name}</Text>
-                                <View style={styles.actionButtons}>
+                                <Text style={styles.songName}>
+      {request.Name} {request.newRequest && '⭐'}
+    </Text>                                
+    <View style={styles.actionButtons}>
                                      <TouchableOpacity onPress={() => 
                                       {
                                         setNotificationDance({
@@ -335,7 +418,15 @@ const Admin = () => {
                 <Text style={styles.details}>Author/Date: {request.AuthorDate}</Text>
                 <Text style={styles.details}>Count: {request.Count}</Text>
                 <Text style={styles.details}>Difficulty: {request.Difficulty}</Text>
-                <Text style={styles.requestCount}>Requests by: {request.requesters}</Text>
+                <Text style={styles.requestCountHeader}>Requested by:</Text>
+                <Text style={styles.requestCount}>{request.requesters.split("\n").map((requestor) => {
+                  let requestorAry = requestor.split(" | ")
+                  let requestName = requestorAry[0]
+                  let requestDate = formatTimestamp(requestorAry[1])
+                  return(
+                    requestName + " - " + requestDate
+                  )
+                }).join("\n")}</Text>
               </TouchableOpacity>
             ))
           ) : (
@@ -400,6 +491,7 @@ const Admin = () => {
           </View>
           </View>
           </Modal>
+          
     </View>
   );
 };
