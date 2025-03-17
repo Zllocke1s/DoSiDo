@@ -4,7 +4,7 @@
     "slug": "stepchique",
     "scheme": "stepchique",
     "newArchEnabled": true,
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.zlaoch.stepchique",
-      "versionCode": 110
+      "versionCode": 120
     },
     "web": {
       "favicon": "./assets/favicon.png",
