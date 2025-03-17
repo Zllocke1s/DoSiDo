@@ -201,7 +201,9 @@ const AllDances = () => {
                 count: dance.count,
                 difficulty: dance.difficulty,
                 requestType: type,
-                id: deviceId
+                id: deviceId,
+                deviceId: deviceId
+
               }),
             });
             

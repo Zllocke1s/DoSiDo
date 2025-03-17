@@ -4,7 +4,7 @@
     "slug": "stepchique",
     "scheme": "stepchique",
     "newArchEnabled": true,
-    "version": "1.2.0",
+    "version": "1.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,6 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.zlaoch.stepchique",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications.",
         "UIBackgroundModes": ["remote-notification"]
       }
     },
@@ -27,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.zlaoch.stepchique",
-      "versionCode": 120
+      "versionCode": 121
     },
     "web": {
       "favicon": "./assets/favicon.png",

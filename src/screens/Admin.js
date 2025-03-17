@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useUser } from '../UserContext';
 
 
 
@@ -35,6 +35,9 @@ const Admin = () => {
 
   const [sortAscending, setSortAscending] = useState(true);
   const [seenRequests, setSeenRequests] = useState(new Set());
+
+
+  const { username, setUsername, deviceId } = useUser();
 
 
   const styles =
@@ -198,7 +201,9 @@ const Admin = () => {
           notificationDanceSong: notificationDance.song,
           notificationDanceAuthor: notificationDance.author,
           notificationDanceCount: notificationDance.count,
-          notificationDanceDifficulty: notificationDance.difficulty
+          notificationDanceDifficulty: notificationDance.difficulty,
+          deviceId: deviceId
+
         }),
       });
 
@@ -231,6 +236,7 @@ const Admin = () => {
         body: JSON.stringify({
           command: 'GetRequests',
           requestType: filter,
+          deviceId: deviceId
         }),
       });
   
@@ -301,6 +307,7 @@ const Admin = () => {
           authorDate: request.AuthorDate,
           count: request.Count,
           difficulty: request.Difficulty,
+          deviceId: deviceId
         }),
       });
 
