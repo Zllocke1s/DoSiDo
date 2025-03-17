@@ -64,7 +64,7 @@ const MyVenue = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log(data)
+     // console.log(data)
       setNotifications(data);
     } catch (err) {
       setError(err.message);
@@ -456,7 +456,7 @@ const MyVenue = ({ navigation }) => {
 
     setPlaylists(updatedPlaylists);
     await AsyncStorage.setItem('playlists', JSON.stringify(updatedPlaylists));
-    console.log(`Dance added to playlist "${playlistName}":`, dance);
+  //  console.log(`Dance added to playlist "${playlistName}":`, dance);
   };
 
 
@@ -554,7 +554,7 @@ const MyVenue = ({ navigation }) => {
           }
         }
 
-        console.log('Dance list parsed successfully:', danceList);
+   //     console.log('Dance list parsed successfully:', danceList);
         setDances(danceList);
         await AsyncStorage.setItem('venueDances', JSON.stringify(danceList));
 
@@ -590,7 +590,7 @@ const MyVenue = ({ navigation }) => {
   const goToPlaylist = async (playlistId) => {
     const data = await getSpotifyPlaylists(playlistId);
     if (data) {
-      console.log("data", data)
+  //    console.log("data", data)
       setPlaylistData(data);
       setNotificationVisible(false)
     }
@@ -598,7 +598,7 @@ const MyVenue = ({ navigation }) => {
   
   useEffect(() => {
     if (playlistData) {
-      console.log(playlistData)
+  //    console.log(playlistData)
       setPlaylistVisible(true);
     }
   }, [playlistData]);
@@ -741,7 +741,7 @@ const MyVenue = ({ navigation }) => {
           <View key={date} style={styles.notificationSection}>
             <Text style={styles.notificationDate}>{date}</Text>
             {group.map(notification => {
-              console.log(notification)
+      //       console.log(notification)
             return(
               notification.dance.link.includes("general") ? 
               <TouchableOpacity style={styles.notificationCard}>

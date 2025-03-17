@@ -3,7 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import * as Notifications from 'expo-notifications';
-
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
@@ -12,47 +13,7 @@ export const UserProvider = ({ children }) => {
   const [pushToken, setPushToken] = useState('');
 
 
-  async function registerForPushNotificationsAsync() {
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
   
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        handleRegistrationError('Permission not granted to get push token for push notification!');
-        return;
-      }
-      const projectId =
-        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-      if (!projectId) {
-        handleRegistrationError('Project ID not found');
-      }
-      try {
-        const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId,
-          })
-        ).data;
-        console.log(pushTokenString);
-        setPushToken(pushTokenString);
-      } catch (e) {
-        handleRegistrationError(`${e}`);
-      }
-    } else {
-      handleRegistrationError('Must use physical device for push notifications');
-    }
-  }
   
 
   useEffect(() => {
@@ -69,7 +30,7 @@ export const UserProvider = ({ children }) => {
         }
         setDeviceId(storedDeviceId);
 
-       registerForPushNotificationsAsync()
+      // registerForPushNotificationsAsync()
       } catch (error) {
         console.error('Error initializing UserContext:', error);
       }
@@ -77,6 +38,58 @@ export const UserProvider = ({ children }) => {
 
     initializeUserContext();
   }, []);
+
+  useEffect(() => {
+    async function registerForPushNotificationsAsync() {
+
+      if (Platform.OS === 'android') {
+        Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+        try {
+
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+          console.log('Permission not granted to get push token for push notification!');
+          handleRegistrationError('Permission not granted to get push token for push notification!');
+          return;
+        }
+
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+
+        if (!projectId) {
+          console.log('Project ID not found');
+          handleRegistrationError('Project ID not found');
+        }
+        console.log('Push token:', projectId);
+          const pushTokenString = (
+            await Notifications.getExpoPushTokenAsync({
+              projectId,
+            })
+          ).data;
+          console.log('Push token:', pushTokenString);
+          setPushToken(pushTokenString);
+        } catch (e) {
+          handleRegistrationError(`${e}`);
+        }
+      
+      
+    }  
+  registerForPushNotificationsAsync();
+  }
+
+    
+  ,[])
 
   const saveUsername = async (newUsername) => {
     try {
