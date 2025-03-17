@@ -349,7 +349,7 @@ const MyVenue = ({ navigation }) => {
   modalTitle: { fontSize: 22, fontWeight: "bold", color: theme.textColor, marginBottom: 10, justifyContent: "space-between" },
   trackItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   albumArt: { width: 50, height: 50, borderRadius: 5 },
-  trackName: { fontSize: 16, color: "white" },
+  trackName: { fontSize: 16, color: theme.textColor },
   artistName: { fontSize: 14, color: "gray" },
   closeButton: { position: "absolute", top: 10, right: 10 },
   
@@ -810,7 +810,7 @@ const MyVenue = ({ navigation }) => {
         ))}
       </ScrollView>
       <TouchableOpacity onPress={() => setNotificationVisible(false)} style={styles.closeButton}>
-        <MaterialIcons name="close" size={28} color="white" />
+        <MaterialIcons name="close" size={28} color={theme.textColor} />
       </TouchableOpacity>
     </View>
   </View>

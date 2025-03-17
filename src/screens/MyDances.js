@@ -404,7 +404,7 @@ const MyDances = ({navigation}) => {
           </ScrollView>
         </>
       )}
-      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.2.1</Text></View>
+      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.2.2</Text></View>
     </View>
   );
 };

@@ -12,7 +12,7 @@ import { useTheme } from '../ThemeContext';
 
 const Tab = createBottomTabNavigator();
 
-export const MainScreen = ({navigation}) => {
+export const MainScreen = ({navigation, initialRoute}) => {
 
   const { username } = useUser();
   const { theme } = useTheme();
@@ -45,7 +45,7 @@ export const MainScreen = ({navigation}) => {
   return (
     <SafeAreaView style={[styles.background,  { backgroundColor: theme.headerBackgroundColor || theme.backgroundColor }]}>
     <Tab.Navigator
-    initialRouteName="MyDances"
+    initialRouteName={initialRoute==null ? "My Venue" : initialRoute}
       screenOptions={({ route }) => ({
         headerShown: false,
 

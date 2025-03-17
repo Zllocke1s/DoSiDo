@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function App() {
+  const [initialRoute, setInitialRoute] = React.useState(null);
 
 
   const savePlaylist = async (playlist, overwrite) => {
@@ -58,7 +59,7 @@ function App() {
       const parsedUrl = Linking.parse(url);
       if (parsedUrl.queryParams?.file) {
         const fileUrl = decodeURIComponent(parsedUrl.queryParams.file);
-  
+        
         try {
           const response = await fetch(fileUrl);
           const playlistJson = await response.text();
@@ -97,6 +98,7 @@ function App() {
         } catch (error) {
           console.error("Error fetching playlist:", error);
         }
+        setInitialRoute("My Dances");
       }
     }
   };
@@ -104,17 +106,15 @@ function App() {
 
   
   useEffect(() => {
-    Linking.addEventListener('url', handleDeepLink);
-    return () => {
-      Linking.removeEventListener('url', handleDeepLink);
-    };
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+    return () => subscription.remove();
   }, []);
   return (
     <SafeAreaProvider>
     <UserProvider>
       <ThemeProvider>
         <NavigationContainer>
-          <MainScreen />
+          <MainScreen initialRoute={initialRoute}/>
         </NavigationContainer>
       </ThemeProvider>
     </UserProvider>

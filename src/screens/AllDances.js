@@ -312,6 +312,11 @@ const AllDances = () => {
     Linking.openURL(link);
   };
 
+  useEffect(() => {
+    fetchDances();
+  }
+  , []);
+
   return (
     <MenuProvider>
       <View style={styles.container}>
