@@ -8,6 +8,7 @@ import { RequestModal } from '../components/RequestModal';
 import { UsernameModal } from '../components/UsernameModal';
 import { useUser } from '../UserContext';
 import { useTheme } from '../ThemeContext';
+import { Share } from 'react-native';
 
 const MyDances = ({navigation}) => {
   const [playlists, setPlaylists] = useState({});
@@ -142,16 +143,73 @@ const MyDances = ({navigation}) => {
       loadPlaylists();
     }, [])
   );
+
+
+  const clearAllPlaylists = async () => {
+    Alert.alert(
+      "Clear All Playlists?",
+      "Are you sure you want to delete all playlists? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Clear All",
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem("playlists");
+              console.log("All playlists have been cleared.");
+              Alert.alert("Success", "All playlists have been deleted.");
+            } catch (error) {
+              console.error("Error clearing playlists:", error);
+              Alert.alert("Error", "Failed to clear playlists.");
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
+  
+
   const loadPlaylists = async () => {
     try {
       const savedPlaylists = JSON.parse(await AsyncStorage.getItem('playlists')) || {};
+      console.log(savedPlaylists)
       setPlaylists(savedPlaylists);
     } catch (error) {
       console.error('Error loading playlists:', error);
     }
   };
 
+  const uploadPlaylist = async (playlist) => {
+    try {
+      const response = await fetch("https://www.stepchique.com/save_playlist.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(playlist),
+      });
   
+      const data = await response.json();
+      return data.fileUrl; // URL of saved playlist file
+    } catch (error) {
+      console.error("Error uploading playlist:", error);
+      return null;
+    }
+  };
+  
+
+  const sharePlaylist = async (playlist) => {
+    const fileUrl = await uploadPlaylist(playlist);
+    if (!fileUrl) return;
+  
+    const deepLink = `https://www.stepchique.com/redir.html?file=${encodeURIComponent(fileUrl)}`;
+  
+    Share.share({
+      message: `Open this playlist in MyDances: ${deepLink}`,
+    });
+  };
 
         // Function to send a request to your PHP API
         const requestDance = async (dance) => {
@@ -319,12 +377,12 @@ const MyDances = ({navigation}) => {
       ) : (
         // Playlist Selection View
         <>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onLongPress={() => {clearAllPlaylists()}}>
           <Text style={styles.title}>My Playlists</Text>
           </TouchableOpacity>
           <ScrollView contentContainerStyle={styles.playlistList}>
             {Object.keys(playlists).length > 0 ? (
-              Object.entries(playlists).map(([playlistName, dances]) => (
+              Object.entries(playlists).map(([playlistName, dances], index) => (
                 <View key={playlistName} style={styles.playlistCard}>
                   <TouchableOpacity
                     style={styles.playlistInfo}
@@ -332,6 +390,9 @@ const MyDances = ({navigation}) => {
                   >
                     <Text style={styles.playlistName}>{playlistName}</Text>
                     <Text style={styles.playlistCount}>{dances.length} dances</Text>
+                    <TouchableOpacity onPress={() => sharePlaylist({name: playlistName, dances: dances})}>
+                      <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
+                    </TouchableOpacity>
                   </TouchableOpacity>
                   
                 </View>
