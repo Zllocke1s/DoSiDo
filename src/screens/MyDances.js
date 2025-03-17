@@ -9,7 +9,7 @@ import { UsernameModal } from '../components/UsernameModal';
 import { useUser } from '../UserContext';
 import { useTheme } from '../ThemeContext';
 import { Share } from 'react-native';
-
+import { Linking } from 'react-native';
 const MyDances = ({navigation}) => {
   const [playlists, setPlaylists] = useState({});
   const [currentPlaylist, setCurrentPlaylist] = useState(null); // Track the current playlist
@@ -404,7 +404,7 @@ const MyDances = ({navigation}) => {
           </ScrollView>
         </>
       )}
-      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.2.2</Text></View>
+      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.3.1</Text></View>
     </View>
   );
 };
