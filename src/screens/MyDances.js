@@ -246,7 +246,8 @@ const MyDances = ({navigation}) => {
                 count: dance.count,
                 difficulty: dance.difficulty,
                 requestType: type,
-                id: deviceId
+                id: deviceId,
+                deviceId: deviceId
               }),
             });
             
@@ -403,7 +404,7 @@ const MyDances = ({navigation}) => {
           </ScrollView>
         </>
       )}
-      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.2.0</Text></View>
+      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.2.1</Text></View>
     </View>
   );
 };

@@ -45,6 +45,8 @@ const MyVenue = ({ navigation }) => {
 
    // Fetch notifications from the server
    const fetchNotifications = async () => {
+
+    if(deviceId!="" && deviceId!=null) {
     try {
       const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
         method: 'POST',
@@ -53,6 +55,7 @@ const MyVenue = ({ navigation }) => {
         },
         body: JSON.stringify({
           command: 'GetNotifications',
+          deviceId: deviceId
         }),
       });
 
@@ -68,10 +71,11 @@ const MyVenue = ({ navigation }) => {
     } finally {
     }
   };
+}
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [deviceId]);
   
 
   const groupNotificationsByDate = () => {
@@ -234,7 +238,7 @@ StyleSheet.create({
     color: theme.textColor, // Theme-based text color
     marginTop: 20,
   },
-  modalTitle: { fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 10, justifyContent: "space-between" },
+  modalTitle: { fontSize: 22, fontWeight: "bold", color: theme.textColor, marginBottom: 10, justifyContent: "space-between" },
   trackItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   albumArt: { width: 50, height: 50, borderRadius: 5 },
   trackName: { fontSize: 16, color: "white" },
@@ -534,7 +538,8 @@ StyleSheet.create({
                 count: dance.count,
                 difficulty: dance.difficulty,
                 requestType: type,
-                id: deviceId
+                id: deviceId,
+                deviceId: deviceId
               }),
             });
             
