@@ -17,11 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.zlaoch.stepchique",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "This identifier will be used to send you notifications.",
         "UIBackgroundModes": [
-          "remote-notification",
-          "remote-notification",
-          "remote-notification",
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false
