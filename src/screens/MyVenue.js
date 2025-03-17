@@ -45,6 +45,8 @@ const MyVenue = ({ navigation }) => {
 
    // Fetch notifications from the server
    const fetchNotifications = async () => {
+
+    if(deviceId!="" && deviceId!=null) {
     try {
       const response = await fetch('https://www.outpostorganizer.com/dosidoapi.php', {
         method: 'POST',
@@ -53,6 +55,7 @@ const MyVenue = ({ navigation }) => {
         },
         body: JSON.stringify({
           command: 'GetNotifications',
+          deviceId: deviceId
         }),
       });
 
@@ -68,10 +71,11 @@ const MyVenue = ({ navigation }) => {
     } finally {
     }
   };
+}
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [deviceId]);
   
 
   const groupNotificationsByDate = () => {
@@ -254,9 +258,102 @@ const MyVenue = ({ navigation }) => {
       textAlign: 'center',
       color: theme.textColor, // Theme-based text color
       marginTop: 20,
-    },
-  });
+    },  
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: theme.borderColor,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: theme.textColor,
+  },  
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: theme.backgroundColor, // Theme-based background color
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginTop: 50,
+    marginBottom: 30, // Increased padding for more spacing
+    textAlign: 'center',
+    color: theme.textColor, // Theme-based text color
+  },
+  searchBar: {
+    height: 40,
+    flex: 0.9,
+    borderColor: theme.borderColor,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    flexShrink: 0,
+    marginBottom: 20,
+    backgroundColor: theme.cardBackgroundColor,
+    color: theme.textColor
+  },
+  clearButton: {
+    flex: 0.05,
+    paddingHorizontal: 10, // Add padding for better appearance
+    minWidth: 50,          // Ensure the button is wide enough for "Clear"
+    alignItems: 'center',  // Center the text horizontally
+    justifyContent: 'center', // Center the text vertically
+  },
   
+  danceList: {
+    paddingBottom: 20,
+  },
+  danceCard: {
+    backgroundColor: theme.cardBackgroundColor, // Theme-based card background
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: theme.textColor, // Theme-based shadow color
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  danceName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: theme.textColor, // Theme-based text color
+    flex: 1,
+  },
+  danceDetails: {
+    fontSize: 14,
+    marginBottom: 3,
+    color: theme.textColor, // Theme-based text color
+  },
+  actionButtons: {
+    flexDirection: 'row',
+  },
+  actionButtonIcon: {
+    marginHorizontal: 5,
+  },
+  noResults: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: theme.textColor, // Theme-based text color
+    marginTop: 20,
+  },
+  modalTitle: { fontSize: 22, fontWeight: "bold", color: theme.textColor, marginBottom: 10, justifyContent: "space-between" },
+  trackItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  albumArt: { width: 50, height: 50, borderRadius: 5 },
+  trackName: { fontSize: 16, color: "white" },
+  artistName: { fontSize: 14, color: "gray" },
+  closeButton: { position: "absolute", top: 10, right: 10 },
+  
+});
 
 
     // Check approval state on component mount
@@ -550,7 +647,8 @@ const MyVenue = ({ navigation }) => {
                 count: dance.count,
                 difficulty: dance.difficulty,
                 requestType: type,
-                id: deviceId
+                id: deviceId,
+                deviceId: deviceId
               }),
             });
             
