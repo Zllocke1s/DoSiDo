@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
@@ -10,6 +10,8 @@ import { useUser } from '../UserContext';
 import { useTheme } from '../ThemeContext';
 import { Share } from 'react-native';
 import { Linking } from 'react-native';
+import * as Updates from 'expo-updates';
+
 const MyDances = ({navigation}) => {
   const [playlists, setPlaylists] = useState({});
   const [currentPlaylist, setCurrentPlaylist] = useState(null); // Track the current playlist
@@ -17,6 +19,7 @@ const MyDances = ({navigation}) => {
   const { username, setUsername, deviceId } = useUser();
   const [tempUsername, setTempUserName] = useState("")
     const { theme } = useTheme();
+  const [debugScreen, showDebugScreen] = useState(false);
 
   const styles =
     StyleSheet.create({
@@ -391,7 +394,7 @@ const MyDances = ({navigation}) => {
                   >
                     <Text style={styles.playlistName}>{playlistName}</Text>
                     <Text style={styles.playlistCount}>{dances.length} dances</Text>
-                    <TouchableOpacity onPress={() => sharePlaylist({name: playlistName, dances: dances})}>
+                    <TouchableOpacity style={{width: 40}} onPress={() => sharePlaylist({name: playlistName, dances: dances})}>
                       <MaterialIcons name="share" size={24} color={theme.textColor} style={styles.actionButtonIcon} />
                     </TouchableOpacity>
                   </TouchableOpacity>
@@ -404,7 +407,41 @@ const MyDances = ({navigation}) => {
           </ScrollView>
         </>
       )}
-      <View style={{position: "absolute", top: 10, right: 10}}><Text>1.3.1</Text></View>
+      <TouchableOpacity onLongPress={() => showDebugScreen(true)} style={{position: "absolute", top: 10, right: 10}}><Text style={{color: theme.textColor}}>1.3.1</Text></TouchableOpacity>
+    { debugScreen &&
+      <TouchableOpacity onPress={() => showDebugScreen(false)} style={{
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      top: 0,
+      left: 0,
+      backgroundColor: theme.backgroundColor + "99",
+      borderWidth: 2
+    }}>
+      <View style={{
+        position: "absolute",
+        top: 50,
+        left: 50,
+        right: 50,
+        bottom: 50,
+        padding: 20,
+        backgroundColor: theme.cardBackgroundColor,
+      }}>
+      <Text style={{color: theme.textColor}}>DoSiDo</Text>
+      <Text style={{color: theme.textColor}}>Version 1.3.1</Text>
+      <Text style={{color: theme.textColor}}>© 2025 Zach Locke</Text>
+      <Text style={{color: theme.textColor}}>All Rights Reserved</Text>
+      <Text style={{color: theme.textColor}}>Made in the USA</Text>
+
+        <Button title="Check for Updates" onPress={() => {
+          Updates.checkForUpdateAsync()
+        }}></Button>
+        <Button title="Install Updates" onPress={() => {
+          Updates.fetchUpdateAsync()
+        }}></Button>
+      </View>
+    </TouchableOpacity>
+    }
     </View>
   );
 };

@@ -8,12 +8,24 @@ import * as Linking from 'expo-linking';
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import * as Updates from 'expo-updates';
 
 
 function App() {
   const [initialRoute, setInitialRoute] = React.useState(null);
 
+  const {
+    currentlyRunning,
+    isUpdateAvailable,
+    isUpdatePending
+  } = Updates.useUpdates();
+
+  useEffect(() => {
+    if (isUpdatePending) {
+      // Update has successfully downloaded; apply it now
+      Updates.reloadAsync();
+    }
+  }, [isUpdatePending]);
 
   const savePlaylist = async (playlist, overwrite) => {
     try {
