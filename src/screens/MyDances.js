@@ -407,7 +407,7 @@ const MyDances = ({navigation}) => {
           </ScrollView>
         </>
       )}
-      <TouchableOpacity onLongPress={() => showDebugScreen(true)} style={{position: "absolute", top: 10, right: 10}}><Text style={{color: theme.textColor}}>1.3.1</Text></TouchableOpacity>
+      <TouchableOpacity onLongPress={() => showDebugScreen(true)} style={{position: "absolute", top: 10, right: 10}}><Text style={{color: theme.textColor}}>1.3.2</Text></TouchableOpacity>
     { debugScreen &&
       <TouchableOpacity onPress={() => showDebugScreen(false)} style={{
       position: 'absolute',
@@ -428,7 +428,7 @@ const MyDances = ({navigation}) => {
         backgroundColor: theme.cardBackgroundColor,
       }}>
       <Text style={{color: theme.textColor}}>DoSiDo</Text>
-      <Text style={{color: theme.textColor}}>Version 1.3.1</Text>
+      <Text style={{color: theme.textColor}}>Version 1.3.2</Text>
       <Text style={{color: theme.textColor}}>© 2025 Zach Locke</Text>
       <Text style={{color: theme.textColor}}>All Rights Reserved</Text>
       <Text style={{color: theme.textColor}}>Made in the USA</Text>
